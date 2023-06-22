@@ -143,7 +143,7 @@ function M.create_global_commands()
     if not files.exists(path_note_today) then
       local template_path = files.join_paths({
         notes_root,
-        '/.note/daily_template.note'
+        '/.note/daily_template'
       })
 
       if files.exists(template_path) then
