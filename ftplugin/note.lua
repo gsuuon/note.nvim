@@ -8,6 +8,8 @@ if not vim.b.did_note_plugin then
     commands.create_buffer_keymaps(note.config.keymap.prefix)
   end
 
+  vim.wo.foldmethod = 'indent'
+
   vim.b.did_note_plugin = true
 end
 

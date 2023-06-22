@@ -229,7 +229,7 @@ function M.create_buffer_keymaps(prefix)
   bufkey('t', ':NoteTime<cr>')
 
   -- [m]ark items
-  for marker in ('.,>*=['):gmatch('.') do
+  for marker in ('-.,>*=['):gmatch('.') do
     bufkey('m' .. marker, function() mark_item(marker) end)
   end
 end
