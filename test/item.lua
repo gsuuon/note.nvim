@@ -1,52 +1,103 @@
-local item = require('note.item')
+local items = require('note.items')
 
-local function collect(text)
-  local xs = {}
+local test_lines = {
+  'word',
+  '- beep',
+  ' . boop',
+  '  [ boop',
+  'not an item',
+  '  - beep',
+  '- boop',
+  '## boop'
+}
 
-  item.find_item(function(x)
-    table.insert(xs, x)
-  end, vim.fn.split(text, '\n'))
+local expected_items =
+  { {
+      body = "beep",
+      marker = "-",
+      position = {
+        col = 0,
+        row = 1
+      }
+    }, {
+      body = "boop",
+      marker = ".",
+      position = {
+        col = 1,
+        row = 2
+      }
+    }, {
+      body = "boop",
+      marker = "[",
+      position = {
+        col = 2,
+        row = 3
+      }
+    }, {
+      body = "beep",
+      marker = "-",
+      position = {
+        col = 2,
+        row = 5
+      }
+    }, {
+      body = "boop",
+      marker = "-",
+      position = {
+        col = 0,
+        row = 6
+      }
+    }, {
+      body = "boop",
+      marker = "##",
+      position = {
+        col = 0,
+        row = 7
+      }
+    } }
 
-  return xs
+local function to_reg(x)
+  vim.fn.setreg('x', vim.inspect(x))
 end
 
-local text = [[
-- beep
- . boop
-  [ boop
-## boop
-]]
+local function test_item_parsing()
+  local function collect(lines)
+    local xs = {}
 
+    items.find_item(function(x)
+      table.insert(xs, x)
+      return false
+    end, lines)
 
-local expected = { {
+    return xs
+  end
+
+  local result = collect(test_lines)
+
+  assert(vim.deep_equal(result, expected_items))
+
+  return result
+end
+
+local function test_scan_items()
+  local result = items.scan_for_item({
+    marker = '-',
+    body = 'beep'
+  }, 2, test_lines)
+
+  local expected = {
     body = "beep",
     marker = "-",
     position = {
-      col = 0,
-      row = 0
-    }
-  }, {
-    body = "boop",
-    marker = ".",
-    position = {
-      col = 1,
-      row = 1
-    }
-  }, {
-    body = "boop",
-    marker = "[",
-    position = {
       col = 2,
-      row = 2
+      row = 5
     }
-  }, {
-    body = "boop",
-    marker = "##",
-    position = {
-      col = 0,
-      row = 3
-    }
-  } }
+  }
 
-assert(vim.deep_equal(collect(text), expected))
--- vim.keymap.set('n', '<leader>,t', item.follow_link_at_cursor)
+  assert(vim.deep_equal(result, expected))
+
+  return result
+end
+
+-- test_item_parsing()
+test_scan_items()
