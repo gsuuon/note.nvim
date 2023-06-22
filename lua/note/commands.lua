@@ -6,14 +6,16 @@ local items = require('note.items')
 local M = {}
 
 local function follow_link_at_cursor()
+  local cursor = util.cursor()
+
   local link = items.get_link_at_col(
     vim.api.nvim_get_current_line(),
-    util.cursor().col
+    cursor.col
   )
 
   if link == nil then return end
 
-  local item = items.find_item_matching(link, files.current_lines())
+  local item = items.scan_for_item(link, cursor.row, files.current_lines())
 
   if item == nil then return end
 

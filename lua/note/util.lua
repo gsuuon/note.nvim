@@ -25,4 +25,20 @@ function M.cursor_set(pos)
   return vim.api.nvim_win_set_cursor(0, {pos.row + 1, pos.col})
 end
 
+--- Takes a slice of a list of 0-indexed start and stop
+function M.tbl_slice(tbl, start, stop, reverse)
+  local res = {}
+  local step = reverse and -1 or 1
+
+  if not reverse then
+    start = start + 1
+  end
+
+  for x=start, stop, step do
+    table.insert(res, tbl[x])
+  end
+
+  return res
+end
+
 return M

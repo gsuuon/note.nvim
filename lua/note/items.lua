@@ -1,3 +1,5 @@
+local util = require('note.util')
+
 local M = {}
 
 ---@class Position
@@ -77,9 +79,36 @@ end
 
 ---@param match fun(item: Item): boolean
 ---@param lines string[]
-local function find_item(match, lines)
+function M.find_item(match, lines)
   for item in items(lines) do
     if match(item) then return item end
+  end
+end
+
+--- Finds the item first scanning down from row, then up from row.
+---@param row number 0-indexed row
+function M.scan_for_item(target, row, lines)
+  local after_lines = util.tbl_slice(lines, row + 1, #lines)
+
+  local item = M.find_item_matching(target, after_lines)
+  if item ~= nil then
+    return vim.tbl_extend('force', item, {
+      position = {
+        row = item.position.row + row + 1,
+        col = item.position.col
+      }
+    })
+  end
+
+  local before_lines = util.tbl_slice(lines, row, 0, true) -- reverse
+  item = M.find_item_matching(target, before_lines)
+  if item ~= nil then
+    return vim.tbl_extend('force', item, {
+      position = {
+        row = row - item.position.row - 1,
+        col = item.position.col
+      }
+    })
   end
 end
 
@@ -119,7 +148,7 @@ local link_marker_classes = {
 ---@param target { marker: string, body: string }
 ---@return Item | nil
 function M.find_item_matching(target, lines)
-  return find_item(
+  return M.find_item(
     function(item)
       local marker_match_pattern = link_marker_classes[target.marker]
 
