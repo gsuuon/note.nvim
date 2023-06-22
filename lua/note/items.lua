@@ -136,13 +136,13 @@ function M.get_link_at_col(line, col)
   end
 end
 
--- Items can change markers, e.g. marking `-` pending as `.` done
--- Links with 'i' will still work after changing status.
--- Titles can also be linked without specifying exact depth
+-- Tasks can change markers, e.g. marking `-` pending as `.` done
+-- Links with 't' will still work after changing status.
+-- Sections can also be linked without specifying exact depth
 local link_marker_classes = {
-  ['i'] = '[>.,-=]',  -- [i]tem
+  ['t'] = '[>.,-=]',  -- [t]ask
   ['p'] = '[*[]',     -- [p]roperty
-  ['t'] = '#+'
+  ['s'] = '#+'        -- [s]ection
 }
 
 ---@param target { marker: string, body: string }
