@@ -237,7 +237,18 @@ function M.create_buffer_keymaps(prefix)
 
   -- [m]ark items
   for marker in ('-.,>*=['):gmatch('.') do
-    bufkey('m' .. marker, function() mark_item(marker) end)
+    vim.keymap.set(
+      'n',
+      prefix .. 'm' .. marker,
+      function()
+        -- makes mark item dot repeatable
+        -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
+        _G.note_last_op = function() mark_item(marker) end
+        vim.o.operatorfunc = 'v:lua.note_last_op'
+        return 'g@l'
+      end,
+      { buffer = true, expr = true }
+    )
   end
 end
 
