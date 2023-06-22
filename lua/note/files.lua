@@ -115,13 +115,23 @@ function M.sibling_across_dirs(file, forward)
   end
 end
 
---- Find which of directories contains directory, if any
+--- Find the longest item in directories which contains directory
 function M.find_containing_directory(directory, directories)
+  local function sort_longest(xs)
+    local items = util.tbl_slice(xs, 0, #xs)
+
+    table.sort(items, function(a,b)
+      return #a > #b
+    end)
+
+    return items
+  end
+
   return util.find_value(
     function (path)
       return util.starts_with(directory, vim.fs.normalize(path))
     end,
-    directories
+    sort_longest(directories)
   )
 end
 
