@@ -21,8 +21,20 @@ function M.cursor()
   }
 end
 
-function M.cursor_set(pos)
-  return vim.api.nvim_win_set_cursor(0, {pos.row + 1, pos.col})
+function M.cursor_set(pos, jump)
+  if jump then
+    -- Need to use a :h jump-motions to add to jump list
+    local row_keys = pos.row + 1 .. 'G0'
+
+    local col_keys = ''
+    if pos.col > 0 then
+      col_keys = pos.col .. 'l'
+    end
+
+    vim.fn.feedkeys(row_keys .. col_keys, 'n')
+  else
+    vim.api.nvim_win_set_cursor(0, {pos.row + 1, pos.col})
+  end
 end
 
 --- Takes a slice of a list of 0-indexed start and stop

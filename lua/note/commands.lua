@@ -19,7 +19,7 @@ local function follow_link_at_cursor()
 
   if item == nil then return end
 
-  util.cursor_set(item.position)
+  util.cursor_set(item.position, true)
 end
 
 local function goto_current_item()
@@ -33,7 +33,7 @@ local function goto_current_item()
 
   if item == nil then return end
 
-  util.cursor_set(item.position)
+  util.cursor_set(item.position, true)
 end
 
 local function goto_note(forward)
@@ -58,7 +58,7 @@ local function goto_find_item(args)
 
   if item == nil then return end
 
-  util.cursor_set(item.position)
+  util.cursor_set(item.position, true)
 end
 
 local function mark_item(marker)
