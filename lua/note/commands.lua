@@ -49,7 +49,7 @@ local function goto_find_item(args)
   local item = items.find_item_matching(
     {
       marker = args.fargs[1],
-      body = args.fargs[1]
+      body = args.fargs[2]
     },
     files.current_lines()
   )
