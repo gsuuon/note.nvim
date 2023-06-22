@@ -14,20 +14,21 @@ function M.join_paths(paths)
   return vim.fs.normalize(vim.fn.simplify(table.concat(paths, '\\')))
 end
 
-local scan = require'plenary.scandir' -- just using this to get directory contents, vim.fs.dir seems broken
--- TODO use vim.fs.dir instead
-local function directories_in(dir)
-  return vim.tbl_map(
-    vim.fs.normalize,
-    scan.scan_dir(dir, { only_dirs = true, depth = 1 })
-  )
-end
+--- List the files, directories or both in a directory
+---@param directory string
+---@param type? 'directory' | 'file'
+local function list(directory, type)
+  local results = {}
 
-local function files_in(dir)
-  return vim.tbl_map(
-    vim.fs.normalize,
-    scan.scan_dir(dir, { hidden = true, depth = 1 })
-  )
+  for name, ty in vim.fs.dir(directory, {
+    depth = 1
+  }) do
+    if type == nil or ty == type then
+      table.insert(results, M.join_paths({directory, name}))
+    end
+  end
+
+  return results
 end
 
 function M.parent(dir)
@@ -37,7 +38,7 @@ end
 local function next_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
 
-  if idx + 1 < #xs then
+  if idx < #xs then
     return xs[idx + 1]
   end
 end
@@ -45,13 +46,13 @@ end
 local function previous_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
 
-  if idx - 1 > 0 then
+  if idx > 1 then
     return xs[idx - 1]
   end
 end
 
 local function sibling_file(file, dir, forward)
-  local results = files_in(dir)
+  local results = list(dir, 'file')
 
   if not M.exists(file) then -- No current file on disk
     if forward then
@@ -69,7 +70,7 @@ local function sibling_file(file, dir, forward)
 end
 
 local function sibling_dir(dir, forward)
-  local dirs = directories_in(M.parent(dir))
+  local dirs = list(M.parent(dir), 'directory')
 
   if forward then
     return next_item_in_list(dirs, dir)
@@ -106,7 +107,12 @@ function M.sibling_across_dirs(file, forward)
     return sibling_file_same_directory
   end
 
-  local sibling_dir_files = files_in(sibling_dir(dir, forward))
+  local sibling_directory = sibling_dir(dir, forward)
+  show(sibling_directory, 'sibling_dir')
+
+  if sibling_directory == nil then return end
+
+  local sibling_dir_files = list(sibling_directory, 'file')
 
   if forward then
     return sibling_dir_files[1]
