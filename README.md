@@ -5,7 +5,7 @@ A simple Neovim note taking plugin with daily notes, task tracking and syntax hi
 https://github.com/gsuuon/note.nvim/assets/6422188/4f186db5-7938-4c45-b791-c1c8fbf88ff7
 
 ## Motivation
-note.nvim makes it easy to take working notes and track tasks. It adds commands to help manipulate task items, create daily notes, and navigate both between and within notes.
+note.nvim makes it easy to take working notes and track tasks. It adds commands to help manipulate task items, create daily notes, and navigate within (and between) notes.
 
 ## Usage
 Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template` which will get copied for each new daily note. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different root directories.
