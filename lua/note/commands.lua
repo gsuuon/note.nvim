@@ -35,7 +35,7 @@ local function goto_current_item()
 end
 
 local function goto_note(forward)
-  local file = files.get_sibling_across_dirs(files.current_file(), forward)
+  local file = files.sibling_across_dirs(files.current_file(), forward)
 
   if file ~= nil then
     vim.cmd.edit(file)

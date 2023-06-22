@@ -34,7 +34,7 @@ function M.parent(dir)
   return vim.fs.normalize(vim.fn.fnamemodify(dir, ':h'))
 end
 
-local function get_next_item_in_list(xs, x)
+local function next_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
 
   if idx + 1 < #xs then
@@ -42,7 +42,7 @@ local function get_next_item_in_list(xs, x)
   end
 end
 
-local function get_previous_item_in_list(xs, x)
+local function previous_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
 
   if idx - 1 > 0 then
@@ -50,7 +50,7 @@ local function get_previous_item_in_list(xs, x)
   end
 end
 
-local function get_sibling_file(file, dir, forward)
+local function sibling_file(file, dir, forward)
   local results = files_in(dir)
 
   if not M.exists(file) then -- No current file on disk
@@ -62,19 +62,19 @@ local function get_sibling_file(file, dir, forward)
   end
 
   if forward then
-    return get_next_item_in_list(results, file)
+    return next_item_in_list(results, file)
   else
-    return get_previous_item_in_list(results, file)
+    return previous_item_in_list(results, file)
   end
 end
 
-local function get_sibling_dir(dir, forward)
+local function sibling_dir(dir, forward)
   local dirs = directories_in(M.parent(dir))
 
   if forward then
-    return get_next_item_in_list(dirs, dir)
+    return next_item_in_list(dirs, dir)
   else
-    return get_previous_item_in_list(dirs, dir)
+    return previous_item_in_list(dirs, dir)
   end
 end
 
@@ -95,16 +95,16 @@ function M.current_lines()
 end
 
 --- Gets the next sibling in same directory or next directory
-function M.get_sibling_across_dirs(file, forward)
+function M.sibling_across_dirs(file, forward)
   local dir = M.parent(file)
 
-  local sibling_file_same_directory = get_sibling_file(file, dir, forward)
+  local sibling_file_same_directory = sibling_file(file, dir, forward)
 
   if sibling_file_same_directory ~= nil then
     return sibling_file_same_directory
   end
 
-  local sibling_dir_files = files_in(get_sibling_dir(dir, forward))
+  local sibling_dir_files = files_in(sibling_dir(dir, forward))
 
   if forward then
     return sibling_dir_files[1]
