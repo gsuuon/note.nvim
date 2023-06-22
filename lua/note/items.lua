@@ -83,9 +83,9 @@ local function find_item(match, lines)
   end
 end
 
---- Get link at 0-indexed col of line
+--- Get link at column of line
 ---@param line string
----@param col number
+---@param col number 0-indexed col of line
 ---@return { marker: string, body: string, col: number }
 function M.get_link_at_col(line, col)
   local start, stop = line:find('%[.-|.-%]')
