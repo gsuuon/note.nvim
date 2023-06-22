@@ -78,11 +78,10 @@ local function make_intermediate_directories()
   end
 end
 
-local function insert_timestamp()
-  local lines = {
-    vim.fn.strftime('* %I:%M.%S %p'),
-    '  ', -- pre-indent the item
-  }
+local function insert_timestamp(marker, pre_indent_child)
+  local lines = { vim.fn.strftime(marker .. ' %I:%M.%S %p') }
+
+  if pre_indent_child then table.insert(lines, '  ') end
 
   local pos = util.cursor()
 
@@ -204,8 +203,10 @@ function M.create_buffer_commands(bufnr)
   vim.api.nvim_buf_create_user_command(
     bufnr,
     'NoteTime',
-    insert_timestamp,
-    {}
+    function(args)
+      insert_timestamp(args.fargs[1] or '*', true)
+    end,
+    {nargs='?'}
   )
 
   vim.api.nvim_create_autocmd({"BufWritePre"}, {
