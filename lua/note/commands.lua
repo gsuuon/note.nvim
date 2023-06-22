@@ -147,8 +147,20 @@ function M.create_global_commands()
       })
 
       if files.exists(template_path) then
-        local template = vim.fn.readfile(template_path)
-        vim.api.nvim_put(template, 'l', false, false)
+        vim.api.nvim_put(
+          vim.fn.readfile(template_path),
+          'l',
+          false,
+          false
+        )
+      else
+        vim.api.nvim_put({
+          '# Goal',
+          '',
+          '# Tasks',
+          '',
+          '# Notes',
+        }, 'l', false, false)
       end
     end
   end
