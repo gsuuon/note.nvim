@@ -8,10 +8,10 @@ https://github.com/gsuuon/note.nvim/assets/6422188/4f186db5-7938-4c45-b791-c1c8f
 note.nvim makes it easy to take working notes and track tasks. It adds commands to help manipulate task items, create daily notes, and navigate both between and within notes.
 
 ## Usage
-Write ideas / tasks / notes in a hierarchical way. Spaces `config.spaces = { '~' }` are note root directories. You can set a template for daily notes by creating `[note_root]/.note/daily_template` which will get copied for each new daily note.
+Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template` which will get copied for each new daily note. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different root directories.
 
 ### Items
-Items are organized hierachically and a marker indicates their type or status. Indented items mean attachment, these can be either sub-tasks or properties.
+A marker indicates their type or status. Indented tasks establish scope and indented properties attach to the outer item.
 
 #### Tasks
 `>` — current  
@@ -25,7 +25,7 @@ Items are organized hierachically and a marker indicates their type or status. I
 `[` — label  
 
 #### Sections
-`#` — section -- number of #'s mean depth, like markdown  
+`#` — section -- Not indented - the number of #'s mean depth like markdown.  
 
 ### Modifiers
 Some special symbols will also highlight to help with readability:
@@ -44,9 +44,9 @@ Links to items within the same file can be created with `[<marker>|<body>]`, whe
 
 The link body will be matched against item bodies via lua's `string.match`
 
+## Example
 ![note](https://github.com/gsuuon/note.nvim/assets/6422188/813e74e7-d9dc-4b5f-b433-4ef294491797)
 
-### Examples
 ```
 - Take out the trash
   [ chore
