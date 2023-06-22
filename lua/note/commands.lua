@@ -99,6 +99,10 @@ local function insert_timestamp(marker, pre_indent_child)
   vim.cmd.startinsert({bang = true})
 end
 
+local function is_day_note(path)
+  return path:match('%d%d%d%d/%d%d/%d%d') ~= nil
+end
+
 function M.create_global_commands()
   --- Gets the space based on current file, then cwd, else first item in config.spaces
   local function current_space()
@@ -157,53 +161,53 @@ function M.create_global_commands()
   vim.api.nvim_create_user_command('NoteIndex', open_note_index, {})
 end
 
-function M.create_buffer_commands(bufnr)
-  bufnr = bufnr or 0
+function M.create_buffer_commands()
+  if is_day_note(vim.fn.bufname()) then
+    vim.api.nvim_buf_create_user_command(
+      0,
+      'NoteNext',
+      goto_next_note,
+      {}
+    )
+
+    vim.api.nvim_buf_create_user_command(
+      0,
+      'NotePrevious',
+      goto_previous_note,
+      {}
+    )
+  end
 
   vim.api.nvim_buf_create_user_command(
-    bufnr,
+    0,
     'NoteGoLink',
     follow_link_at_cursor,
     {}
   )
 
   vim.api.nvim_buf_create_user_command(
-    bufnr,
+    0,
     'NoteFindItem',
     goto_find_item,
     {nargs='+'}
   )
 
   vim.api.nvim_buf_create_user_command(
-    bufnr,
+    0,
     'NoteMarkItem',
     function(args) mark_item(args.fargs[1]) end,
     {nargs=1}
   )
 
   vim.api.nvim_buf_create_user_command(
-    bufnr,
+    0,
     'NoteCurrentItem',
     goto_current_item,
     {}
   )
 
   vim.api.nvim_buf_create_user_command(
-    bufnr,
-    'NoteNext',
-    goto_next_note,
-    {}
-  )
-
-  vim.api.nvim_buf_create_user_command(
-    bufnr,
-    'NotePrevious',
-    goto_previous_note,
-    {}
-  )
-
-  vim.api.nvim_buf_create_user_command(
-    bufnr,
+    0,
     'NoteTime',
     function(args)
       insert_timestamp(args.fargs[1] or '*', true)
@@ -212,7 +216,7 @@ function M.create_buffer_commands(bufnr)
   )
 
   vim.api.nvim_create_autocmd({"BufWritePre"}, {
-    buffer = bufnr,
+    buffer = 0,
     callback = make_intermediate_directories
   })
 end
@@ -223,8 +227,11 @@ function M.create_buffer_keymaps(prefix)
     vim.keymap.set(mode, prefix .. lhs, rhs, {buffer = true})
   end
 
-  bufkey('n', ':NoteNext<cr>')
-  bufkey('p', ':NotePrevious<cr>')
+  if is_day_note(vim.fn.bufname()) then
+    bufkey('n', ':NoteNext<cr>')
+    bufkey('p', ':NotePrevious<cr>')
+  end
+
   bufkey('l', ':NoteGoLink<cr>')
   bufkey('t', ':NoteTime<cr>')
 
