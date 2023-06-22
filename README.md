@@ -8,7 +8,7 @@ https://github.com/gsuuon/note.nvim/assets/6422188/4f186db5-7938-4c45-b791-c1c8f
 note.nvim makes it easy to take working notes and track tasks. It adds commands to help manipulate task items, create daily notes, and navigate within (and between) notes.
 
 ## Usage
-Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template` which will get copied for each new daily note. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different root directories.
+Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template`. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different note root directories.
 
 ### Items
 A marker indicates their type or status. Indented tasks establish scope and indented properties attach to the outer item.
@@ -36,13 +36,13 @@ Some special symbols will also highlight to help with readability:
 `(!)` — warn -- draw attention to something important  
 
 ### Links
-Links to items within the same file can be created with `[<marker>|<body>]`, where marker is either a marker character or one of these:
+Links to items within the same file can be created with `[<marker>|<body>]`.
+`<body>` will be matched against item bodies via lua's `string.match`, and `<marker>` is a specific marker or one of these special characters:
 
 `s` — section -- matches any number of #'s  
 `p` — property -- matches any property marker  
 `t` — task -- matches any task marker  
 
-The link body will be matched against item bodies via lua's `string.match`
 
 ## Example
 ![note](https://github.com/gsuuon/note.nvim/assets/6422188/813e74e7-d9dc-4b5f-b433-4ef294491797)
@@ -98,9 +98,9 @@ require('note').setup({
 
 ## Keymaps
 ### Note buffers
+`<prefix>t` — NoteTime  
 `<prefix>l` — NoteGoLink  
-`<prefix>m<marker>` — NoteMarkItem -- only for item markers  
-`<prefix>t` — NoteTime
+`<prefix>m<marker>` — NoteMarkItem -- only for task or property markers  
 
 #### Daily notes
 `<prefix>n` — NoteNext  
