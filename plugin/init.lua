@@ -3,7 +3,7 @@ vim.filetype.add({
         note = 'note',
     },
     pattern = {
-        ['.*/notes/.+'] = { 'note', priority = -1 }
+        ['.*/notes/.*'] = { 'note', { priority = -1 } }
     }
 })
 
