@@ -122,11 +122,14 @@ function M.get_link_at_col(line, col)
 
   while start ~= nil do
     if col >= start and col <= stop then
-      local marker, body =
-        line:sub(start, stop):match('%[(.-)|(.-)%]')
+      local head, body = line:sub(start, stop):match('%[(.-)|(.-)%]')
+
+      local file = head:match('%((.+)%)')
+      local marker = head:match('.+%)?(.+)')
 
       return {
         marker = marker,
+        file = file,
         body = body,
         col = start - 1
       }
