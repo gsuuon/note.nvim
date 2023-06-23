@@ -53,4 +53,14 @@ function M.tbl_slice(tbl, start, stop, reverse)
   return res
 end
 
+---Convert a pattern to a case insensitive pattern (a -> [Aa])
+---@param pat string
+function M.pattern_to_case_insensitive(pat)
+  return pat:gsub('(%a)',
+    function (l)
+      return '[' .. l:upper() .. l:lower() .. ']'
+    end
+  )
+end
+
 return M

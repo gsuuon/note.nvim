@@ -15,7 +15,13 @@ local function follow_link_at_cursor()
 
   if link == nil then return end
 
-  local item = items.scan_for_item(link, cursor.row, files.current_lines())
+  link.body = util.pattern_to_case_insensitive(link.body)
+
+  local item = items.scan_for_item(
+    link,
+    cursor.row,
+    files.current_lines()
+  )
 
   if item == nil then return end
 
