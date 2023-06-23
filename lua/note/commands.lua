@@ -216,8 +216,19 @@ function M.create_buffer_commands()
   vim.api.nvim_buf_create_user_command(
     0,
     'NoteMarkItem',
-    function(args) mark_item(args.fargs[1]) end,
-    {nargs=1}
+    function(args)
+      if args.range == 2 then
+        for row=args.line1,args.line2 do
+          mark_item(args.fargs[1], row - 1)
+        end
+      else
+        mark_item(args.fargs[1])
+      end
+    end,
+    {
+      nargs=1,
+      range=true
+    }
   )
 
   vim.api.nvim_buf_create_user_command(
@@ -264,11 +275,19 @@ function M.create_buffer_keymaps(prefix)
       function()
         -- makes mark item dot repeatable
         -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
-        _G.note_last_op = function() mark_item(marker) end
+        _G.note_last_op = function()
+          mark_item(marker)
+        end
         vim.o.operatorfunc = 'v:lua.note_last_op'
         return 'g@l'
       end,
       { buffer = true, expr = true }
+    )
+
+    vim.keymap.set(
+      'v',
+      prefix .. 'm' .. marker,
+      ":'<,'>NoteMarkItem " .. marker .. '<cr>'
     )
   end
 end
