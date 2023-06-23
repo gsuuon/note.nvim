@@ -125,7 +125,7 @@ function M.get_link_at_col(line, col)
       local head, body = line:sub(start, stop):match('%[(.-)|(.-)%]')
 
       local file = head:match('%((.+)%)')
-      local marker = head:match('.+%)?(.+)')
+      local marker = head:match('.*%)?(.+)')
 
       return {
         marker = marker,
