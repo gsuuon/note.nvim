@@ -115,7 +115,7 @@ end
 --- Get link at column of line
 ---@param line string
 ---@param col number 0-indexed col of line
----@return { marker: string, body: string, col: number }
+---@return { marker: string, body: string, col: number, file?: string } | nil
 function M.get_link_at_col(line, col)
   local start, stop = line:find('%[.-|.-%]')
   col = col + 1

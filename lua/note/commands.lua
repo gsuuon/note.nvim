@@ -15,6 +15,14 @@ local function follow_link_at_cursor()
 
   if link == nil then return end
 
+  if link.file ~= nil then
+    local filepath = files.join_paths({
+      files.current_file_directory(),
+      link.file,
+    })
+    vim.cmd.edit(filepath)
+  end
+
   link.body = util.pattern_to_case_insensitive(link.body)
 
   local item = items.scan_for_item(
@@ -25,7 +33,7 @@ local function follow_link_at_cursor()
 
   if item == nil then return end
 
-  util.cursor_set(item.position, true)
+  util.cursor_set(item.position, link.file == nil)
 end
 
 local function goto_current_item()
