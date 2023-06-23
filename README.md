@@ -36,15 +36,14 @@ Some special symbols will also highlight to help with readability:
 `(!)` — warn -- draw attention to something important  
 
 ### Links
-Links to items within the same file can be created with `[<marker>|<body>]`.
-`<body>` will be matched against item bodies via lua's `string.match`, and `<marker>` is a specific marker or one of these special characters:
+Links to items can be created with `[(<file>)<head>|<body>]`. `<body>` behaves like a case-insensitive `string.match` against items, first searching downwards from the link and then upwards. `(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. `<marker>` is a specific marker or one of these special characters:
 
 `s` — section -- matches any number of #'s  
 `p` — property -- matches any property marker  
 `t` — task -- matches any task marker  
 
 
-## Example
+## Examples
 ![note](https://github.com/gsuuon/note.nvim/assets/6422188/813e74e7-d9dc-4b5f-b433-4ef294491797)
 
 ```
@@ -59,6 +58,15 @@ Here `Take out the trash` is labeled as a `[ chore`.
   > Pick up toys
 ```
 Here `Pick up toys` is the current (`>`) task and is part of `Cleanup house`.
+
+```
+[t|monday]
+# Gym
+- Monday
+  - Squats
+[(../health)s|goal]
+```
+Here `[t|monday]` links to the `- Monday` task and `[(../health)s|goal]` links to the the 'health' file up one directory at a section matching `goal`.
 
 # Setup
 ```lua
