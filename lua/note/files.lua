@@ -97,6 +97,40 @@ function M.current_lines(start, stop)
   return vim.api.nvim_buf_get_lines(0, start, stop, false)
 end
 
+---Tries to get the line at row of buffer
+---@param row number 0-indexed row
+---@param bufnr? number
+---@return string
+function M.line(row, bufnr)
+  local success, lines = pcall(
+    vim.api.nvim_buf_get_lines,
+    bufnr or 0,
+    row,
+    row + 1,
+    true
+  )
+
+  if success and #lines > 0 then
+    return lines[1]
+  end
+end
+
+---Tries to set the line at row of buffer
+---@param row number 0-indexed row
+---@param line string
+---@param bufnr? number
+function M.set_line(row, line, bufnr)
+  return pcall(
+    vim.api.nvim_buf_set_lines,
+    bufnr or 0,
+    row,
+    row + 1,
+    true,
+    { line }
+  )
+end
+
+
 --- Gets the next sibling in same directory or next directory
 function M.sibling_across_dirs(file, forward)
   local dir = M.parent(file)

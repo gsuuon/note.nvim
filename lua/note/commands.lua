@@ -67,15 +67,18 @@ local function goto_find_item(args)
   util.cursor_set(item.position, true)
 end
 
-local function mark_item(marker)
-  local item = items.line_as_item(vim.api.nvim_get_current_line())
+---@param marker string
+---@param row? number 1-indexed row number
+local function mark_item(marker, row)
+  row = row or util.cursor().row
+
+  local line = files.line(row)
+  local item = items.line_as_item(line)
 
   if item ~= nil then
-    vim.api.nvim_set_current_line(
-      items.item_as_line(
-        vim.tbl_extend('force', item, { marker = marker })
-      )
-    )
+    item.marker = marker
+
+    files.set_line(row, items.item_as_line(item))
   end
 end
 
