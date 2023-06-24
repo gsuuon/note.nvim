@@ -44,9 +44,15 @@ end
 
 ---Maps over an iterator
 ---@param map fun(control, value): any map
----@param packed_iterator { fun, any, any} packed iterator,e.g. `table.pack(ipairs(xs))`
+---@param iterator any iterator, can be packed table of an iterator
 local function iter_map(map, packed_iterator)
-  local fn, state, last = table.unpack(packed_iterator)
+  local fn, state, last
+
+  if type(packed_iterator) == 'function' then
+    fn = packed_iterator
+  else
+    fn, state, last = table.unpack(packed_iterator)
+  end
   local control = last
 
   return function ()
@@ -84,6 +90,25 @@ end
 function M.items(lines)
   return items_from_iter(table.pack(ipairs(lines)))
 end
+
+---Iterate over children of an item
+---@param parent_item Item parent item
+---@param lines string[] all lines of file
+local function children(parent_item, lines)
+  local start_row = parent_item.position.row
+
+  return iter_map(
+    function(item)
+      if item.position.col > parent_item.position.col then
+        return item
+      end
+    end,
+    items_from_iter(
+      util.tbl_iter(lines, start_row, #lines)
+    )
+  )
+end
+
 ---@param item ItemLine
 function M.item_as_line(item)
   return
