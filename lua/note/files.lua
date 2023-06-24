@@ -91,10 +91,8 @@ function M.current_file()
   return vim.fs.normalize(vim.fn.expand('%:p'))
 end
 
-function M.current_lines(start, stop)
-  start = start or 0
-  stop = stop or -1
-  return vim.api.nvim_buf_get_lines(0, start, stop, false)
+function M.current_lines()
+  return vim.api.nvim_buf_get_lines(0, 0, -1, false)
 end
 
 ---Tries to get the line at row of buffer
