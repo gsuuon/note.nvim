@@ -96,7 +96,8 @@ require('note').setup({
 ### Note buffers
 `NoteCurrentItem` — Jump to the current task (`>`)  
 `NoteFindItem <marker> <body pattern>` — Jump to a matching item  
-`NoteMarkItem <marker>` — Change the marker of the item under cursor  
+`NoteMarkItem <marker>` — Change the marker of the item under cursor. Only for task or property markers  
+`NoteMarkItemChildren <marker>` — The cursor item and all children with a matching marker get marked  
 `NoteGoLink` — Follow the link under cursor  
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
 
@@ -108,7 +109,8 @@ require('note').setup({
 ### Note buffers
 `<prefix>t` — NoteTime  
 `<prefix>l` — NoteGoLink  
-`<prefix>m<marker>` — NoteMarkItem -- only for task or property markers  
+`<prefix>m<marker>` — NoteMarkItem
+`<prefix>M<marker>` — NoteMarkItemChildren
 
 #### Daily notes
 `<prefix>n` — NoteNext  
