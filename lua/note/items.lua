@@ -45,7 +45,8 @@ end
 ---Maps over an iterator
 ---@param map fun(control, value): any map
 ---@param iterator any iterator, can be packed table of an iterator
-local function iter_map(map, packed_iterator)
+---@param stop_at_nil boolean stop mapping if map returns nil
+local function iter_map(map, packed_iterator, stop_at_nil)
   local fn, state, last
 
   if type(packed_iterator) == 'function' then
@@ -59,7 +60,7 @@ local function iter_map(map, packed_iterator)
     for i, val in fn, state, control do
       control = i
       local result = map(i, val)
-      if result ~= nil then
+      if result ~= nil or stop_at_nil then
         return result
       end
     end
@@ -94,8 +95,8 @@ end
 ---Iterate over children of an item
 ---@param parent_item Item parent item
 ---@param lines string[] all lines of file
-local function children(parent_item, lines)
-  local start_row = parent_item.position.row
+function M.children(parent_item, lines)
+  local start_row = parent_item.position.row + 1
 
   return iter_map(
     function(item)
@@ -105,14 +106,15 @@ local function children(parent_item, lines)
     end,
     items_from_iter(
       util.tbl_iter(lines, start_row, #lines)
-    )
+    ),
+    true
   )
 end
 
----@param item ItemLine
+---@param item ItemLine | Item
 function M.item_as_line(item)
   return
-    (' '):rep(item.col)
+    (' '):rep(item.col or item.position.col)
     .. item.marker
     .. ' '
     .. item.body

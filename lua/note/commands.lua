@@ -91,6 +91,28 @@ local function mark_item(marker, row)
   end
 end
 
+local function mark_item_children(marker)
+  local row = util.cursor().row
+
+  local item = items.line_as_item(files.line(row))
+  if item ~= nil then
+    item.position = {
+      col = item.col,
+      row = row
+    }
+    item.col = nil
+
+    for child in items.children(item, files.current_lines()) do
+      child.marker = marker
+
+      files.set_line(
+        child.position.row,
+        items.item_as_line(child)
+      )
+    end
+  end
+end
+
 local function make_intermediate_directories()
   local parent_dir = files.current_file_directory()
   if not files.dir_exists(parent_dir) then
@@ -238,6 +260,15 @@ function M.create_buffer_commands()
       nargs=1,
       range=true
     }
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteMarkItemChildren',
+    function(args)
+      mark_item_children(args.fargs[1])
+    end,
+    {nargs=1}
   )
 
   vim.api.nvim_buf_create_user_command(
