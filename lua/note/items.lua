@@ -42,32 +42,37 @@ end
 ---@field marker string marker character
 ---@field position Position start position of the item marker
 
---- Iterate over items in lines
----@return fun(): Item
-local function items(lines)
-  local current_line_idx = 0
+---Iterates items over a packed iterator (e.g. table.pack(ipairs(lines)))
+---@param packed_iterator any
+---@return function iterator
+local function items_from_iter(packed_iterator)
+  local fn, state, last = table.unpack(packed_iterator)
+  local control = last
 
-  return function()
-    local item
+  return function ()
+    for row, line in fn, state, control do
+      control = row
 
-    while item == nil and current_line_idx < #lines do
-      current_line_idx = current_line_idx + 1
-      item = M.line_as_item(lines[current_line_idx])
-    end
-
-    if item ~= nil then
-      return {
-        body = item.body,
-        marker = item.marker,
-        position = {
-          row = current_line_idx - 1,
-          col = item.col
+      local item = M.line_as_item(line)
+      if item ~= nil then
+        return {
+          body = item.body,
+          marker = item.marker,
+          position = {
+            row = row - 1,
+            col = item.col
+          }
         }
-      }
+      end
     end
   end
 end
 
+---Iterate over items in lines
+---@return fun(): Item
+local function items(lines)
+  return items_from_iter(table.pack(ipairs(lines)))
+end
 ---@param item ItemLine
 function M.item_as_line(item)
   return
