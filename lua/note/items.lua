@@ -93,28 +93,23 @@ end
 --- Finds the item first scanning down from row, then up from row.
 ---@param row number 0-indexed row
 function M.scan_for_item(target, row, lines)
-  local after_lines = util.tbl_slice(lines, row + 1, #lines)
+  -- Scan down from row
+  local item = M.find_item_matching_iter(
+    target,
+    table.pack(
+      util.tbl_iter(lines, row + 1, #lines)
+    )
+  )
+  if item ~= nil then return item end
 
-  local item = M.find_item_matching(target, after_lines)
-  if item ~= nil then
-    return vim.tbl_extend('force', item, {
-      position = {
-        row = item.position.row + row + 1,
-        col = item.position.col
-      }
-    })
-  end
-
-  local before_lines = util.tbl_slice(lines, row, 0, true) -- reverse
-  item = M.find_item_matching(target, before_lines)
-  if item ~= nil then
-    return vim.tbl_extend('force', item, {
-      position = {
-        row = row - item.position.row - 1,
-        col = item.position.col
-      }
-    })
-  end
+  -- Scan up from row
+  item = M.find_item_matching_iter(
+    target,
+    table.pack(
+      util.tbl_iter(lines, row, 0)
+    )
+  )
+  if item ~= nil then return item end
 end
 
 --- Get link at column of line
@@ -153,24 +148,36 @@ local link_marker_classes = {
   ['s'] = '#+'        -- [s]ection
 }
 
+local function match_item_target(target, item)
+  local marker_match_pattern = link_marker_classes[target.marker]
+
+  local marker_matches =
+  marker_match_pattern ~= nil
+  and item.marker:match(marker_match_pattern)
+  or item.marker == target.marker
+
+  if not marker_matches then return false end
+
+  return item.body:match(target.body)
+end
+
 ---@param target { marker: string, body: string }
 ---@return Item | nil
 function M.find_item_matching(target, lines)
   return M.find_item(
     function(item)
-      local marker_match_pattern = link_marker_classes[target.marker]
-
-      local marker_matches =
-      marker_match_pattern ~= nil
-      and item.marker:match(marker_match_pattern)
-      or item.marker == target.marker
-
-      if not marker_matches then return false end
-
-      return item.body:match(target.body)
+      return match_item_target(target, item)
     end,
     lines
   )
+end
+
+function M.find_item_matching_iter(target, packed_iter_lines)
+  for item in items_from_iter(packed_iter_lines) do
+    if match_item_target(target, item) then
+      return item
+    end
+  end
 end
 
 return M

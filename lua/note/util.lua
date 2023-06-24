@@ -53,6 +53,36 @@ function M.tbl_slice(tbl, start, stop, reverse)
   return res
 end
 
+---Iterate over a list from start to stop. Start can be greater than stop to iterate backwards
+---@param tbl any[]
+---@param start number 0-indexed start
+---@param stop number 0-indexed start
+function M.tbl_iter(tbl, start, stop)
+  local reverse = stop < start
+  local step = reverse and -1 or 1
+
+  local cur = reverse and start + 1 or start
+  stop = reverse and stop + 1 or stop
+
+  local function should_continue()
+    if reverse then
+      return cur > stop
+    else
+      return cur < stop
+    end
+  end
+
+  return function()
+    if should_continue() then
+      cur = cur + step
+      local val = tbl[cur]
+      if val ~= nil then
+        return cur, val
+      end
+    end
+  end
+end
+
 ---Convert a pattern to a case insensitive pattern (a -> [Aa])
 ---@param pat string
 function M.pattern_to_case_insensitive(pat)
