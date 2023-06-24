@@ -195,7 +195,9 @@ function M.create_global_commands()
 
     vim.cmd('e ' .. path_note_today)
 
-    if not files.exists(path_note_today) then
+    local lines = files.current_lines()
+
+    if #lines == 1 and lines[1] == '' then
       local template_path = files.join_paths({
         notes_root,
         '/.note/daily_template'
