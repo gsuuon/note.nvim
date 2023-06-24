@@ -93,4 +93,8 @@ function M.pattern_to_case_insensitive(pat)
   )
 end
 
+function M.iter(xs)
+  return table.pack(ipairs(xs))
+end
+
 return M

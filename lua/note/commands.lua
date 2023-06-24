@@ -5,6 +5,13 @@ local items = require('note.items')
 
 local M = {}
 
+local function find_item(target)
+  return items.find_item_matching_iter(
+    target,
+    util.iter(files.current_lines())
+  )
+end
+
 local function follow_link_at_cursor()
   local cursor = util.cursor()
 
@@ -37,13 +44,10 @@ local function follow_link_at_cursor()
 end
 
 local function goto_current_item()
-  local item = items.find_item_matching(
-    {
-      marker = '>',
-      body = '.'
-    },
-    files.current_lines()
-  )
+  local item = find_item({
+    marker = '>',
+    body = '.'
+  })
 
   if item == nil then return end
 
@@ -62,13 +66,10 @@ local function goto_next_note() goto_note(true) end
 local function goto_previous_note() goto_note(false) end
 
 local function goto_find_item(args)
-  local item = items.find_item_matching(
-    {
-      marker = args.fargs[1],
-      body = args.fargs[2]
-    },
-    files.current_lines()
-  )
+  local item = find_item({
+    marker = args.fargs[1],
+    body = args.fargs[2]
+  })
 
   if item == nil then return end
 

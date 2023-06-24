@@ -161,17 +161,6 @@ local function match_item_target(target, item)
   return item.body:match(target.body)
 end
 
----@param target { marker: string, body: string }
----@return Item | nil
-function M.find_item_matching(target, lines)
-  return M.find_item(
-    function(item)
-      return match_item_target(target, item)
-    end,
-    lines
-  )
-end
-
 function M.find_item_matching_iter(target, packed_iter_lines)
   for item in items_from_iter(packed_iter_lines) do
     if match_item_target(target, item) then
