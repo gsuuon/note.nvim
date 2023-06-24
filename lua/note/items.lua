@@ -70,7 +70,7 @@ end
 
 ---Iterate over items in lines
 ---@return fun(): Item
-local function items(lines)
+function M.items(lines)
   return items_from_iter(table.pack(ipairs(lines)))
 end
 ---@param item ItemLine
@@ -85,7 +85,7 @@ end
 ---@param match fun(item: Item): boolean
 ---@param lines string[]
 function M.find_item(match, lines)
-  for item in items(lines) do
+  for item in M.items(lines) do
     if match(item) then return item end
   end
 end

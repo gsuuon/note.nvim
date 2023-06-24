@@ -64,10 +64,9 @@ local function test_item_parsing()
   local function collect(lines)
     local xs = {}
 
-    items.find_item(function(x)
-      table.insert(xs, x)
-      return false
-    end, lines)
+    for item in items.items(lines) do
+      table.insert(xs, item)
+    end
 
     return xs
   end
@@ -99,5 +98,5 @@ local function test_scan_items()
   return result
 end
 
--- test_item_parsing()
+test_item_parsing()
 test_scan_items()
