@@ -11,6 +11,11 @@ local M = {}
 ---@field marker string marker character
 ---@field col number start col of the item marker
 
+---@class Item
+---@field body string content of the item
+---@field marker string marker character
+---@field position Position start position of the item marker
+
 --- Try to parse a line as an item
 ---@param line string
 ---@return ItemLine | nil
@@ -37,35 +42,41 @@ function M.line_as_item(line)
   end
 end
 
----@class Item
----@field body string content of the item
----@field marker string marker character
----@field position Position start position of the item marker
-
----Iterates items over a packed iterator (e.g. table.pack(ipairs(lines)))
----@param packed_iterator any
----@return function iterator
-local function items_from_iter(packed_iterator)
+---Maps over an iterator
+---@param map fun(control, value): any map
+---@param packed_iterator { fun, any, any} packed iterator,e.g. `table.pack(ipairs(xs))`
+local function iter_map(map, packed_iterator)
   local fn, state, last = table.unpack(packed_iterator)
   local control = last
 
   return function ()
-    for row, line in fn, state, control do
-      control = row
-
-      local item = M.line_as_item(line)
-      if item ~= nil then
-        return {
-          body = item.body,
-          marker = item.marker,
-          position = {
-            row = row - 1,
-            col = item.col
-          }
-        }
+    for i, val in fn, state, control do
+      control = i
+      local result = map(i, val)
+      if result ~= nil then
+        return result
       end
     end
   end
+end
+
+---Iterates items over a packed iterator (e.g. table.pack(ipairs(lines)))
+---@param packed_iterator any
+---@return fun(): Item iterator
+local function items_from_iter(packed_iterator)
+  return iter_map(function(row, line)
+    local item = M.line_as_item(line)
+    if item ~= nil then
+      return {
+        body = item.body,
+        marker = item.marker,
+        position = {
+          row = row - 1,
+          col = item.col
+        }
+      }
+    end
+  end, packed_iterator)
 end
 
 ---Iterate over items in lines
