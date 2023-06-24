@@ -20,7 +20,7 @@ local M = {}
 ---@param line string
 ---@return ItemLine | nil
 function M.line_as_item(line)
-  local indents, marker, body = line:match('^(%s*)(.) (.+)')
+  local indents, marker, body = line:match('^(%s*)([^%s]) (.+)')
 
   if indents ~= nil then
     return {
