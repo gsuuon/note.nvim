@@ -91,24 +91,39 @@ local function mark_item(marker, row)
   end
 end
 
+---Mark item and all children with matching markers
 local function mark_item_children(marker)
   local row = util.cursor().row
 
-  local item = items.line_as_item(files.line(row))
-  if item ~= nil then
-    item.position = {
-      col = item.col,
+  local parent = items.line_as_item(files.line(row))
+
+  if parent ~= nil then
+    files.set_line(
+      row,
+      items.item_as_line(
+        vim.tbl_extend('force',
+          parent,
+          {
+            marker = marker
+          }
+        )
+      )
+    )
+
+    parent.position = {
+      col = parent.col,
       row = row
     }
-    item.col = nil
 
-    for child in items.children(item, files.current_lines()) do
-      child.marker = marker
+    for child in items.children(parent, files.current_lines()) do
+      if child.marker == parent.marker then
+        child.marker = marker
 
-      files.set_line(
-        child.position.row,
-        items.item_as_line(child)
-      )
+        files.set_line(
+          child.position.row,
+          items.item_as_line(child)
+        )
+      end
     end
   end
 end
@@ -307,20 +322,32 @@ function M.create_buffer_keymaps(prefix)
   bufkey('l', ':NoteGoLink<cr>')
   bufkey('t', ':NoteTime<cr>')
 
+  local function dot_repeatable(fn)
+    -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
+    return function ()
+      _G.note_last_op = fn
+      vim.o.operatorfunc = 'v:lua.note_last_op'
+      return 'g@l'
+    end
+  end
+
   -- [m]ark items
   for marker in ('-.,>*=['):gmatch('.') do
     vim.keymap.set(
       'n',
       prefix .. 'm' .. marker,
-      function()
-        -- makes mark item dot repeatable
-        -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
-        _G.note_last_op = function()
-          mark_item(marker)
-        end
-        vim.o.operatorfunc = 'v:lua.note_last_op'
-        return 'g@l'
-      end,
+      dot_repeatable(function()
+        mark_item(marker)
+      end),
+      { buffer = true, expr = true }
+    )
+
+    vim.keymap.set(
+      'n',
+      prefix .. 'M' .. marker,
+      dot_repeatable(function()
+        mark_item_children(marker)
+      end),
       { buffer = true, expr = true }
     )
 
