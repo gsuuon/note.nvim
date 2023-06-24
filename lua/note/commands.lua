@@ -5,6 +5,31 @@ local items = require('note.items')
 
 local M = {}
 
+local function current_space()
+  local file_space = files.find_containing_directory(
+    files.current_file_directory(),
+    note.config.spaces
+  )
+
+  if file_space ~= nil then return file_space end
+
+  local working_space = files.find_containing_directory(
+    files.current_working_directory(),
+    note.config.spaces
+  )
+
+  if working_space ~= nil then return working_space end
+
+  return note.config.spaces[1]
+end
+
+local function current_note_root()
+  return files.join_paths({
+    current_space(),
+    'notes/'
+  })
+end
+
 local function find_item(target)
   return items.find_item_matching_iter(
     target,
@@ -23,10 +48,20 @@ local function follow_link_at_cursor()
   if link == nil then return end
 
   if link.file ~= nil then
-    local filepath = files.join_paths({
-      files.current_file_directory(),
-      link.file,
-    })
+
+    local filepath
+    if util.starts_with(link.file, '/') then
+      filepath = files.join_paths({
+        current_note_root(),
+        link.file,
+      })
+    else
+      filepath = files.join_paths({
+        files.current_file_directory(),
+        link.file,
+      })
+    end
+
     vim.cmd.edit(filepath)
   end
 
@@ -160,30 +195,6 @@ end
 
 function M.create_global_commands()
   --- Gets the space based on current file, then cwd, else first item in config.spaces
-  local function current_space()
-    local file_space = files.find_containing_directory(
-      files.current_file_directory(),
-      note.config.spaces
-    )
-
-    if file_space ~= nil then return file_space end
-
-    local working_space = files.find_containing_directory(
-      files.current_working_directory(),
-      note.config.spaces
-    )
-
-    if working_space ~= nil then return working_space end
-
-    return note.config.spaces[1]
-  end
-
-  local function current_note_root()
-    return files.join_paths({
-      current_space(),
-      'notes/'
-    })
-  end
 
   local function open_note_day()
     local notes_root = current_note_root()
