@@ -49,6 +49,7 @@ Links to items can be created with `[(<file>)<marker>|<body>]`. They're just sho
 `t` — task -- matches any task marker  
 
 For example:
+
 `[t|clean]` links to a task containing 'clean'  
 `[(chores)s|daily]` links to a file in the same directory as the current file named 'chores' and finds the first section with 'daily'  
 `[(/budget)t|groceries]` links to the 'budget' file in the note root and finds the first 'groceries' task  
