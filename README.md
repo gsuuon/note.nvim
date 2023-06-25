@@ -11,7 +11,7 @@ note.nvim makes it easy to take working notes and track tasks. It adds commands 
 Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template`. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different note root directories.
 
 ### Items
-A marker indicates their type or status. Indented tasks establish scope and indented properties attach to the outer item.
+A marker indicates their type or status. Indented tasks establish scope and indented properties attach to the outer item. Normal text that are't items will just be ignored by the item commands.
 
 #### Tasks
 `>` — current  
