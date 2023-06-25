@@ -36,11 +36,22 @@ Some special symbols will also highlight to help with readability:
 `(!)` — warn -- draw attention to something important  
 
 ### Links
-Links to items can be created with `[(<file>)<head>|<body>]`. `<body>` behaves like a case-insensitive `string.match` against items, first searching downwards from the link and then upwards. `(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. `<marker>` is a specific marker or one of these special characters:
+Links to items can be created with `[(<file>)<marker>|<body>]`. They're just shortcuts that search for a target item, first by searching downwards from the link and then upwards.
+
+`<body>` behaves like a case-insensitive `string.match` against items.
+
+`(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. If the file part starts with `/` then the path is resolved relative to the note root.
+
+`<marker>` is a specific marker (e.g. `-`, `*`) or one of these special characters:
 
 `s` — section -- matches any number of #'s  
 `p` — property -- matches any property marker  
 `t` — task -- matches any task marker  
+
+For example:
+`[t|clean]` links to a task containing 'clean'  
+`[(chores)s|daily]` links to a file in the same directory as the current file named 'chores' and finds the first section with 'daily'  
+`[(/budget)t|groceries]` links to the 'budget' file in the note root and finds the first 'groceries' task  
 
 
 ## Examples
