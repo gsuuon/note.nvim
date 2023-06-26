@@ -10,6 +10,14 @@ if not vim.b.did_note_plugin then
 
   vim.wo.foldmethod = 'indent'
 
+  local success, llm_prompts = pcall(require, 'llm.prompts')
+  if success then
+    llm_prompts.add_buffer_plugin_prompts(
+      'note',
+      require('note.llm.prompts')
+    )
+  end
+
   vim.b.did_note_plugin = true
 end
 
