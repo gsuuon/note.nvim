@@ -30,6 +30,7 @@ local function current_note_root()
   })
 end
 
+---@param target Target
 local function find_item(target)
   return items.scan_for_item(
     target,
@@ -345,8 +346,8 @@ function M.create_buffer_keymaps(prefix)
     end
   end
 
-  -- [m]ark items
   for marker in ('-.,>*=['):gmatch('.') do
+    -- [m]ark items
     vim.keymap.set(
       'n',
       prefix .. 'm' .. marker,
@@ -356,6 +357,14 @@ function M.create_buffer_keymaps(prefix)
       { buffer = true, expr = true }
     )
 
+    -- [m]ark items (visual)
+    vim.keymap.set(
+      'v',
+      prefix .. 'm' .. marker,
+      ":'<,'>NoteMarkItem " .. marker .. '<cr>'
+    )
+
+    -- [M]ark item children
     vim.keymap.set(
       'n',
       prefix .. 'M' .. marker,
@@ -365,10 +374,17 @@ function M.create_buffer_keymaps(prefix)
       { buffer = true, expr = true }
     )
 
+    -- [f]ind item
     vim.keymap.set(
-      'v',
-      prefix .. 'm' .. marker,
-      ":'<,'>NoteMarkItem " .. marker .. '<cr>'
+      'n',
+      prefix .. 'f' .. marker,
+      dot_repeatable(function()
+        local item = find_item({marker = marker, body = '.'})
+        if item == nil then return end
+
+        util.cursor_set(item.position, true)
+      end),
+      { buffer = true, expr = true }
     )
   end
 end

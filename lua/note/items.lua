@@ -16,6 +16,10 @@ local M = {}
 ---@field marker string marker character
 ---@field position Position start position of the item marker
 
+---@class Target
+---@field body string pattern to search for
+---@field marker string marker character or marker class
+
 --- Try to parse a line as an item
 ---@param line string
 ---@return ItemLine | nil
