@@ -140,7 +140,6 @@ function M.sibling_across_dirs(file, forward)
   end
 
   local sibling_directory = sibling_dir(dir, forward)
-  show(sibling_directory, 'sibling_dir')
 
   if sibling_directory == nil then return end
 
