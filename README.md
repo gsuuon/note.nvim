@@ -123,8 +123,9 @@ require('note').setup({
 ### Note buffers
 `<prefix>t` — NoteTime  
 `<prefix>l` — NoteGoLink  
-`<prefix>m<marker>` — NoteMarkItem
-`<prefix>M<marker>` — NoteMarkItemChildren
+`<prefix>m<marker>` — NoteMarkItem <marker>  
+`<prefix>M<marker>` — NoteMarkItemChildren <marker>  
+`<prefix>f<marker>` — NoteFindItem <marker> .  
 
 #### Daily notes
 `<prefix>n` — NoteNext  
