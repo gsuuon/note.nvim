@@ -44,8 +44,8 @@ end
 
 ---Maps over an iterator
 ---@param map fun(control, value): any map
----@param iterator any iterator, can be packed table of an iterator
----@param stop_at_nil boolean stop mapping if map returns nil
+---@param packed_iterator any iterator, can be packed table of an iterator
+---@param stop_at_nil? boolean stop mapping if map returns nil
 local function iter_map(map, packed_iterator, stop_at_nil)
   local fn, state, last
 
@@ -128,11 +128,41 @@ function M.find_item(match, lines)
   end
 end
 
+-- Tasks can change markers, e.g. marking `-` pending as `.` done
+-- Links with 't' will still work after changing status.
+-- Sections can also be linked without specifying exact depth
+local link_marker_classes = {
+  ['t'] = '[>.,-=]',  -- [t]ask
+  ['p'] = '[*[]',     -- [p]roperty
+  ['s'] = '#+'        -- [s]ection
+}
+
+local function match_item_target(target, item)
+  local marker_match_pattern = link_marker_classes[target.marker]
+
+  local marker_matches =
+  marker_match_pattern ~= nil
+  and item.marker:match(marker_match_pattern)
+  or item.marker == target.marker
+
+  if not marker_matches then return false end
+
+  return item.body:match(target.body)
+end
+
+local function find_item_matching_iter(target, packed_iter_lines)
+  for item in items_from_iter(packed_iter_lines) do
+    if match_item_target(target, item) then
+      return item
+    end
+  end
+end
+
 --- Finds the item first scanning down from row, then up from row.
 ---@param row number 0-indexed row
 function M.scan_for_item(target, row, lines)
   -- Scan down from row
-  local item = M.find_item_matching_iter(
+  local item = find_item_matching_iter(
     target,
     table.pack(
       util.tbl_iter(lines, row + 1, #lines)
@@ -141,7 +171,7 @@ function M.scan_for_item(target, row, lines)
   if item ~= nil then return item end
 
   -- Scan up from row
-  item = M.find_item_matching_iter(
+  item = find_item_matching_iter(
     target,
     table.pack(
       util.tbl_iter(lines, row, 0)
@@ -174,36 +204,6 @@ function M.get_link_at_col(line, col)
     end
 
     start, stop = line:find('%[.+|.+%]', stop)
-  end
-end
-
--- Tasks can change markers, e.g. marking `-` pending as `.` done
--- Links with 't' will still work after changing status.
--- Sections can also be linked without specifying exact depth
-local link_marker_classes = {
-  ['t'] = '[>.,-=]',  -- [t]ask
-  ['p'] = '[*[]',     -- [p]roperty
-  ['s'] = '#+'        -- [s]ection
-}
-
-local function match_item_target(target, item)
-  local marker_match_pattern = link_marker_classes[target.marker]
-
-  local marker_matches =
-  marker_match_pattern ~= nil
-  and item.marker:match(marker_match_pattern)
-  or item.marker == target.marker
-
-  if not marker_matches then return false end
-
-  return item.body:match(target.body)
-end
-
-function M.find_item_matching_iter(target, packed_iter_lines)
-  for item in items_from_iter(packed_iter_lines) do
-    if match_item_target(target, item) then
-      return item
-    end
   end
 end
 

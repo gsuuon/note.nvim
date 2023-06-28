@@ -31,9 +31,10 @@ local function current_note_root()
 end
 
 local function find_item(target)
-  return items.find_item_matching_iter(
+  return items.scan_for_item(
     target,
-    util.iter(files.current_lines())
+    util.cursor().row,
+    files.current_lines()
   )
 end
 
