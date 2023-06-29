@@ -145,7 +145,6 @@ function M.set_line(row, line, bufnr, insert)
   )
 end
 
-
 --- Gets the next sibling in same directory or next directory
 function M.sibling_across_dirs(file, forward)
   local dir = M.parent(file)

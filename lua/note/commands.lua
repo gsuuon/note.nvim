@@ -395,9 +395,20 @@ function M.create_buffer_commands()
     function()
       local cursor_item = items.cursor_item()
       if cursor_item == nil then return end
-      show(cursor_item, 'cursor')
 
       activity.mark_start(cursor_item)
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteTaskDone',
+    function()
+      local cursor_item = items.cursor_item()
+      if cursor_item == nil then return end
+
+      activity.mark_done(cursor_item)
     end,
     {}
   )

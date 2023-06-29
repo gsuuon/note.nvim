@@ -116,6 +116,15 @@ function M.children(parent_item, lines)
   )
 end
 
+---@return Item | nil
+function M.get_last_child(parent, lines)
+  local last
+  for x in M.children(parent, lines) do
+    last = x
+  end
+  return last
+end
+
 ---@param item ItemLine | Item
 function M.item_as_line(item)
   return
@@ -210,10 +219,16 @@ function M.add_child(parent, child)
     }
   })
 
-  local line = M.item_as_line(child_item)
-  files.set_line(child_item.position.row, line, nil, true)
+  M.add_item(child_item)
 
   return child_item
+end
+
+---Inserts item at its position
+function M.add_item(item)
+  local line = M.item_as_line(item)
+  files.set_line(item.position.row, line, nil, true)
+  return item
 end
 
 --- Get link at column of line
