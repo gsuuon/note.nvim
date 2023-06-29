@@ -104,7 +104,7 @@ require('note').setup({
 ## Commands
 
 ### Global
-`Note` — Create or open the daily note  
+`Note <path>` — Create or open the daily note if no arguments. Tab completes arguments with files from current note root  
 `NoteIndex` — Edit the note index of the current space  
 
 ### Note buffers
