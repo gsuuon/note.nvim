@@ -201,13 +201,19 @@ end
 
 ---@param parent Item
 ---@param child { marker: string, body: string }
+---@return Item
 function M.add_child(parent, child)
   local child_item = vim.tbl_extend('force', child, {
-    col = parent.position.col + vim.o.sw
+    position = {
+      col = parent.position.col + vim.o.sw,
+      row = parent.position.row + 1
+    }
   })
 
   local line = M.item_as_line(child_item)
-  files.set_line(parent.position.row + 1, line, nil, true)
+  files.set_line(child_item.position.row, line, nil, true)
+
+  return child_item
 end
 
 --- Get link at column of line

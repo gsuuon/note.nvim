@@ -2,6 +2,7 @@ local note = require('note')
 local util = require('note.util')
 local files = require('note.files')
 local items = require('note.items')
+local activity = require('note.activity')
 
 local M = {}
 
@@ -188,7 +189,7 @@ local function make_intermediate_directories()
 end
 
 local function insert_timestamp(marker, pre_indent_child)
-  local lines = { vim.fn.strftime(marker .. ' %I:%M.%S %p') }
+  local lines = { (marker or '*') .. ' ' .. util.timestamp() }
 
   if pre_indent_child then table.insert(lines, '  ') end
 
@@ -386,6 +387,19 @@ function M.create_buffer_commands()
     {
       nargs='+',
     }
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteTaskStart',
+    function()
+      local cursor_item = items.cursor_item()
+      if cursor_item == nil then return end
+      show(cursor_item, 'cursor')
+
+      activity.mark_start(cursor_item)
+    end,
+    {}
   )
 
   vim.api.nvim_buf_create_user_command(

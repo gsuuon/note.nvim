@@ -97,4 +97,8 @@ function M.iter(xs)
   return table.pack(ipairs(xs))
 end
 
+function M.timestamp()
+  return vim.fn.strftime('%I:%M.%S %p')
+end
+
 return M
