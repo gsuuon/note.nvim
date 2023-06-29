@@ -1,4 +1,5 @@
 local util = require('note.util')
+local files = require('note.files')
 
 local M = {}
 
@@ -182,6 +183,31 @@ function M.scan_for_item(target, row, lines)
     )
   )
   if item ~= nil then return item end
+end
+
+--- Gets the item under the cursor
+---@return Item | nil
+function M.cursor_item()
+  local item = M.line_as_item(vim.api.nvim_get_current_line())
+  if item == nil then return end
+
+  return vim.tbl_extend('force', item, {
+    position = {
+      col = item.col,
+      row = util.cursor().row
+    }
+  })
+end
+
+---@param parent Item
+---@param child { marker: string, body: string }
+function M.add_child(parent, child)
+  local child_item = vim.tbl_extend('force', child, {
+    col = parent.position.col + vim.o.sw
+  })
+
+  local line = M.item_as_line(child_item)
+  files.set_line(parent.position.row + 1, line, nil, true)
 end
 
 --- Get link at column of line

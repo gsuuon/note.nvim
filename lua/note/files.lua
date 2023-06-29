@@ -133,12 +133,13 @@ end
 ---@param row number 0-indexed row
 ---@param line string
 ---@param bufnr? number
-function M.set_line(row, line, bufnr)
+---@param insert? boolean
+function M.set_line(row, line, bufnr, insert)
   return pcall(
     vim.api.nvim_buf_set_lines,
     bufnr or 0,
     row,
-    row + 1,
+    row + (insert and 0 or 1),
     true,
     { line }
   )

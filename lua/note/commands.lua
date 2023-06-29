@@ -165,6 +165,21 @@ local function mark_item_children(marker)
   end
 end
 
+local function add_child(args)
+  if #args.fargs ~= 2 then
+    error('Missing marker or body argument')
+  end
+
+  local parent = items.cursor_item()
+
+  if parent == nil then return end
+
+  items.add_child(parent, {
+    marker = args.fargs[1],
+    body = args.fargs[2]
+  })
+end
+
 local function make_intermediate_directories()
   local parent_dir = files.current_file_directory()
   if not files.dir_exists(parent_dir) then
@@ -362,6 +377,15 @@ function M.create_buffer_commands()
     'NoteCurrentItem',
     goto_current_item,
     {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteAddChild',
+    add_child,
+    {
+      nargs='+',
+    }
   )
 
   vim.api.nvim_buf_create_user_command(
