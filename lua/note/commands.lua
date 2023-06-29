@@ -239,7 +239,63 @@ function M.create_global_commands()
     vim.cmd('e ' .. files.join_paths({current_note_root(), 'index'}))
   end
 
-  vim.api.nvim_create_user_command('Note', open_note_day, {})
+  local function open(args)
+    if #args.fargs > 0 then
+      -- join fargs with note root
+      local file = files.join_paths(
+        vim.tbl_flatten({
+          current_note_root(),
+          args.fargs,
+        })
+      )
+
+      vim.cmd.edit(file)
+    else
+      open_note_day()
+    end
+  end
+
+  local function complete_open(cur, line, col)
+    -- TODO use cur / col in case we arrow back to a previous path
+    local arg_paths = vim.fn.split(line, ' ')
+
+    if cur == '' then
+      -- last path is complete
+      local paths = util.tbl_slice(arg_paths, 1, #arg_paths)
+      table.insert(paths, 1, current_note_root())
+      return files.list(
+        files.join_paths(paths),
+        {
+          no_join = true,
+          no_hidden = true
+        }
+      )
+    end
+
+    -- last path is being typed
+    local paths = util.tbl_slice(arg_paths, 1, #arg_paths - 1)
+    table.insert(paths, 1, current_note_root())
+    local head_files = files.list(
+      files.join_paths(paths),
+      {
+        no_join = true,
+        no_hidden = true
+      }
+    )
+
+    if cur == '' then return head_files end
+
+    return vim.fn.matchfuzzy(head_files, cur)
+  end
+
+  vim.api.nvim_create_user_command(
+    'Note',
+    open,
+    {
+      nargs='*',
+      complete = complete_open,
+    }
+  )
   vim.api.nvim_create_user_command('NoteIndex', open_note_index, {})
 end
 
