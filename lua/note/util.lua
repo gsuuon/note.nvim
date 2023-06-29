@@ -37,7 +37,7 @@ function M.cursor_set(pos, jump)
   end
 end
 
---- Takes a slice of a list of 0-indexed start and stop
+--- Takes a slice of a list of 0-indexed start and stop (exclusive)
 function M.tbl_slice(tbl, start, stop, reverse)
   local res = {}
   local step = reverse and -1 or 1

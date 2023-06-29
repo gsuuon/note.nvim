@@ -14,17 +14,33 @@ function M.join_paths(paths)
   return vim.fs.normalize(vim.fn.simplify(table.concat(paths, '\\')))
 end
 
+---@class ListOptions
+---@field type? 'directory' | 'file'
+---@field no_join? boolean don't join the file path with directory
+---@field no_hidden? boolean filter out paths starting with '.'
+
 --- List the files, directories or both in a directory
 ---@param directory string
----@param type? 'directory' | 'file'
-local function list(directory, type)
+---@param opts? ListOptions
+function M.list(directory, opts)
+  opts = opts or {}
+
   local results = {}
 
   for name, ty in vim.fs.dir(directory, {
     depth = 1
   }) do
-    if type == nil or ty == type then
-      table.insert(results, M.join_paths({directory, name}))
+    if opts.type == nil or ty == opts.type then
+      if not (opts.no_hidden and util.starts_with(name, '.')) then
+        if opts.no_join then
+          table.insert(results, name)
+        else
+          table.insert(
+            results,
+            M.join_paths({ directory, name, })
+          )
+        end
+      end
     end
   end
 
@@ -52,7 +68,7 @@ local function previous_item_in_list(xs, x)
 end
 
 local function sibling_file(file, dir, forward)
-  local results = list(dir, 'file')
+  local results = M.list(dir, {type = 'file'})
 
   if not M.exists(file) then -- No current file on disk
     if forward then
@@ -70,7 +86,7 @@ local function sibling_file(file, dir, forward)
 end
 
 local function sibling_dir(dir, forward)
-  local dirs = list(M.parent(dir), 'directory')
+  local dirs = M.list(M.parent(dir), { type = 'directory'})
 
   if forward then
     return next_item_in_list(dirs, dir)
@@ -98,7 +114,7 @@ end
 ---Tries to get the line at row of buffer
 ---@param row number 0-indexed row
 ---@param bufnr? number
----@return string
+---@return string | nil
 function M.line(row, bufnr)
   local success, lines = pcall(
     vim.api.nvim_buf_get_lines,
@@ -143,7 +159,7 @@ function M.sibling_across_dirs(file, forward)
 
   if sibling_directory == nil then return end
 
-  local sibling_dir_files = list(sibling_directory, 'file')
+  local sibling_dir_files = M.list(sibling_directory, { type = 'file' })
 
   if forward then
     return sibling_dir_files[1]
