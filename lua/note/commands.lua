@@ -3,6 +3,7 @@ local util = require('note.util')
 local files = require('note.files')
 local items = require('note.items')
 local activity = require('note.activity')
+local report = require('note.report')
 
 local M = {}
 
@@ -386,6 +387,15 @@ function M.create_buffer_commands()
       if cursor_item == nil then return end
 
       activity.mark_done(cursor_item, files.current_lines())
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteReport',
+    function()
+      buf_split(vim.inspect(report.generate(files.current_lines())))
     end,
     {}
   )
