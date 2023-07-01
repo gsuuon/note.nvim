@@ -56,6 +56,8 @@ end
 local function next_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
 
+  if idx == nil then return end
+
   if idx < #xs then
     return xs[idx + 1]
   end
@@ -63,6 +65,8 @@ end
 
 local function previous_item_in_list(xs, x)
   local _, idx = util.find_value(function(y) return y == x end, xs)
+
+  if idx == nil then return end
 
   if idx > 1 then
     return xs[idx - 1]
