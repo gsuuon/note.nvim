@@ -313,6 +313,7 @@ function M.create_global_commands()
       complete = complete_open,
     }
   )
+
   vim.api.nvim_create_user_command('NoteIndex', open_note_index, {})
 end
 
@@ -332,29 +333,6 @@ function M.create_buffer_commands()
       {}
     )
   end
-
-  vim.api.nvim_buf_create_user_command(
-    0,
-    'NoteBoop',
-    function()
-      local lines = files.current_lines()
-
-      local parent = items.parent(items.cursor_item(), lines)
-      if parent == nil then return end
-      local unfinished =
-        items.find_child(function(child)
-          return items.relative_depth(parent, child) == 1
-                  and child.marker:match('[%-%=]')
-        end, parent, lines)
-
-      if unfinished == nil then
-        -- all depth 1 are finished
-        items.set_item(parent, { marker = '.' })
-      end
-    end,
-    {}
-  )
-
 
   vim.api.nvim_buf_create_user_command(
     0,
@@ -465,6 +443,8 @@ function M.create_buffer_keymaps(prefix)
 
   bufkey('l', ':NoteGoLink<cr>')
   bufkey('t', ':NoteTime<cr>')
+  bufkey('s', ':NoteTaskStart<cr>')
+  bufkey('d', ':NoteTaskDone<cr>')
 
   local function dot_repeatable(fn)
     -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
