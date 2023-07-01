@@ -115,54 +115,29 @@ local function goto_find_item(args)
 end
 
 ---@param marker string
----@param row? number 1-indexed row number
-local function mark_item(marker, row)
-  row = row and row - 1 or util.cursor().row
+---@param row1? number 1-indexed row number
+local function mark_item(marker, row1)
+  local row = row1 and row1 - 1 or util.cursor().row
 
   local line = files.line(row)
-  local item = items.line_as_item(line)
+  if line == nil then return end
+
+  local item = items.parse_item(line, row)
 
   if item == nil then return end
-
-  items.set_item(
-    items.itemline_as_item(item, row),
-    { marker = marker }
-  )
+  items.set_item(item, { marker = marker })
 end
 
 ---Mark item and all children with matching markers
 local function mark_item_children(marker)
-  local row = util.cursor().row
+  local parent = items.cursor_item()
+  if parent == nil then return end
 
-  local parent = items.line_as_item(files.line(row))
+  items.set_item(parent, { marker = marker })
 
-  if parent ~= nil then
-    files.set_line(
-      row,
-      items.item_as_line(
-        vim.tbl_extend('force',
-          parent,
-          {
-            marker = marker
-          }
-        )
-      )
-    )
-
-    parent.position = {
-      col = parent.col,
-      row = row
-    }
-
-    for child in items.children(parent, files.current_lines()) do
-      if child.marker == parent.marker then
-        child.marker = marker
-
-        files.set_line(
-          child.position.row,
-          items.item_as_line(child)
-        )
-      end
+  for child in items.children(parent, files.current_lines()) do
+    if child.marker == parent.marker then
+      items.set_item(child, { marker = marker })
     end
   end
 end

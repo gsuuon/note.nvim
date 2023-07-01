@@ -7,11 +7,6 @@ local M = {}
 ---@field row number 0-indexed row
 ---@field col number 0-indexed column
 
----@class ItemLine
----@field body string content of the item
----@field marker string marker character
----@field col number start col of the item marker
-
 ---@class Item
 ---@field body string content of the item
 ---@field marker string marker character
@@ -23,15 +18,19 @@ local M = {}
 
 --- Try to parse a line as an item
 ---@param line string
----@return ItemLine | nil
-function M.line_as_item(line)
+---@param row number
+---@return Item | nil
+function M.parse_item(line, row)
   local indents, marker, body = line:match('^(%s*)([^%s]) (.+)')
 
   if indents ~= nil then
     return {
       body = body,
       marker = marker,
-      col = #indents
+      position = {
+        col = #indents,
+        row = row
+      }
     }
   end
 
@@ -42,23 +41,12 @@ function M.line_as_item(line)
     return {
       body = text,
       marker = depth,
-      col = 0
+      position = {
+        col = 0,
+        row = row
+      }
     }
   end
-end
-
----@param item_line ItemLine
----@param row number 0-indexed row
-function M.itemline_as_item(item_line, row)
-  -- TODO refactor to use this in other parts
-  return {
-    marker = item_line.marker,
-    body = item_line.body,
-    position = {
-      col = item_line.col,
-      row = row
-    }
-  }
 end
 
 ---Maps over an iterator
@@ -87,21 +75,12 @@ local function iter_map(map, packed_iterator, stop_at_nil)
 end
 
 ---Iterates items over a packed iterator (e.g. table.pack(ipairs(lines)))
+---iterator's first return value should be 1-indexed row
 ---@param packed_iterator any
 ---@return fun(): Item iterator
 local function items_from_iter(packed_iterator)
-  return iter_map(function(row, line)
-    local item = M.line_as_item(line)
-    if item ~= nil then
-      return {
-        body = item.body,
-        marker = item.marker,
-        position = {
-          row = row - 1,
-          col = item.col
-        }
-      }
-    end
+  return iter_map(function(row1, line)
+    return M.parse_item(line, row1 - 1)
   end, packed_iterator)
 end
 
@@ -132,17 +111,10 @@ end
 
 ---@return Item | nil
 function M.parent(item, lines)
-  for row, line in util.tbl_iter(lines, item.position.row, 0) do
-    local x = M.line_as_item(line)
-    if x ~= nil then
-      if x.col < item.position.col then
-        return vim.tbl_extend('force', x, {
-          position = {
-            row = row - 1,
-            col = x.col
-          }
-        })
-      end
+  for row1, line in util.tbl_iter(lines, item.position.row, 0) do
+    local x = M.parse_item(line, row1 - 1)
+    if x ~= nil and x.position.col < item.position.col then
+      return x
     end
   end
 end
@@ -174,10 +146,10 @@ function M.relative_depth(a, b)
   return depth
 end
 
----@param item ItemLine | Item
+---@param item Item
 function M.item_as_line(item)
   return
-    (' '):rep(item.col or item.position.col)
+    (' '):rep(item.position.col)
     .. item.marker
     .. ' '
     .. item.body
@@ -246,15 +218,12 @@ end
 --- Gets the item under the cursor
 ---@return Item | nil
 function M.cursor_item()
-  local item = M.line_as_item(vim.api.nvim_get_current_line())
-  if item == nil then return end
+  local cursor = util.cursor()
 
-  return vim.tbl_extend('force', item, {
-    position = {
-      col = item.col,
-      row = util.cursor().row
-    }
-  })
+  local line = files.line(cursor.row)
+  if line == nil then return end
+
+  return M.parse_item(line, cursor.row)
 end
 
 ---@param parent Item
