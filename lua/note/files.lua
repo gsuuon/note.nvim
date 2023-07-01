@@ -143,11 +143,13 @@ end
 ---@param bufnr? number
 ---@param insert? boolean
 function M.set_line(row, line, bufnr, insert)
+  local start = row
+  local stop = start + (insert and 0 or 1)
   return pcall(
     vim.api.nvim_buf_set_lines,
     bufnr or 0,
-    row,
-    row + (insert and 0 or 1),
+    start,
+    stop,
     true,
     { line }
   )

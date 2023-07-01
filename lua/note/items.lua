@@ -47,6 +47,20 @@ function M.line_as_item(line)
   end
 end
 
+---@param item_line ItemLine
+---@param row number 0-indexed row
+function M.itemline_as_item(item_line, row)
+  -- TODO refactor to use this in other parts
+  return {
+    marker = item_line.marker,
+    body = item_line.body,
+    position = {
+      col = item_line.col,
+      row = row
+    }
+  }
+end
+
 ---Maps over an iterator
 ---@param map fun(control, value): any map
 ---@param packed_iterator any iterator, can be packed table of an iterator
@@ -117,12 +131,47 @@ function M.children(parent_item, lines)
 end
 
 ---@return Item | nil
+function M.parent(item, lines)
+  for row, line in util.tbl_iter(lines, item.position.row, 0) do
+    local x = M.line_as_item(line)
+    if x ~= nil then
+      if x.col < item.position.col then
+        return vim.tbl_extend('force', x, {
+          position = {
+            row = row - 1,
+            col = x.col
+          }
+        })
+      end
+    end
+  end
+end
+
+---@return Item | nil
 function M.get_last_child(parent, lines)
   local last
   for x in M.children(parent, lines) do
     last = x
   end
   return last
+end
+
+---@return Item | nil
+function M.find_child(match, parent, lines)
+  for child in M.children(parent, lines) do
+    if match(child) then
+      return child
+    end
+  end
+end
+
+---@param a Item
+---@param b Item
+---@return number Relative depth of b to a (based on vim.o.sw) - can be float
+function M.relative_depth(a, b)
+  local diff = b.position.col - a.position.col
+  local depth = diff / vim.o.sw
+  return depth
 end
 
 ---@param item ItemLine | Item
@@ -224,10 +273,43 @@ function M.add_child(parent, child)
   return child_item
 end
 
+---Add child to parent at end
+---@param parent Item
+---@param child { marker: string, body: string }
+---@param lines string[]
+---@return Item
+function M.add_last_child(parent, child, lines)
+  local last = M.get_last_child(parent, lines)
+  if last == nil then
+    return M.add_child(parent, child)
+  else
+    return M.add_item({
+      body = child.body,
+      marker = child.marker,
+      position = {
+        row = last.position.row + 1,
+        col = parent.position.col + vim.o.sw
+      }
+    })
+  end
+end
+
+---@param item Item
+---@param update { marker: string, body: string }
+function M.set_item(item, update)
+  local item_ = vim.tbl_extend('force', item, update)
+  files.set_line(item_.position.row, M.item_as_line(item_))
+  return item_
+end
+
 ---Inserts item at its position
 function M.add_item(item)
-  local line = M.item_as_line(item)
-  files.set_line(item.position.row, line, nil, true)
+  files.set_line(
+    item.position.row,
+    M.item_as_line(item),
+    nil,
+    true
+  )
   return item
 end
 

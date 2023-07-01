@@ -117,16 +117,17 @@ end
 ---@param marker string
 ---@param row? number 1-indexed row number
 local function mark_item(marker, row)
-  row = row or util.cursor().row
+  row = row and row - 1 or util.cursor().row
 
   local line = files.line(row)
   local item = items.line_as_item(line)
 
-  if item ~= nil then
-    item.marker = marker
+  if item == nil then return end
 
-    files.set_line(row, items.item_as_line(item))
-  end
+  items.set_item(
+    items.itemline_as_item(item, row),
+    { marker = marker }
+  )
 end
 
 ---Mark item and all children with matching markers
@@ -334,6 +335,29 @@ function M.create_buffer_commands()
 
   vim.api.nvim_buf_create_user_command(
     0,
+    'NoteBoop',
+    function()
+      local lines = files.current_lines()
+
+      local parent = items.parent(items.cursor_item(), lines)
+      if parent == nil then return end
+      local unfinished =
+        items.find_child(function(child)
+          return items.relative_depth(parent, child) == 1
+                  and child.marker:match('[%-%=]')
+        end, parent, lines)
+
+      if unfinished == nil then
+        -- all depth 1 are finished
+        items.set_item(parent, { marker = '.' })
+      end
+    end,
+    {}
+  )
+
+
+  vim.api.nvim_buf_create_user_command(
+    0,
     'NoteGoLink',
     follow_link_at_cursor,
     {}
@@ -408,7 +432,7 @@ function M.create_buffer_commands()
       local cursor_item = items.cursor_item()
       if cursor_item == nil then return end
 
-      activity.mark_done(cursor_item)
+      activity.mark_done(cursor_item, files.current_lines())
     end,
     {}
   )
