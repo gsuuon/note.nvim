@@ -69,6 +69,10 @@ local function previous_item_in_list(xs, x)
   end
 end
 
+---@param type 'file' | 'directory'
+---@param path string
+---@param forward boolean
+---@return string | nil
 local function sibling(type, path, forward)
   local parent = M.parent(path)
   local siblings = M.list(parent, {type = type})
@@ -93,14 +97,6 @@ local function sibling(type, path, forward)
   else
     return previous_item_in_list(siblings, path)
   end
-end
-
-local function sibling_file(file, forward)
-  return sibling('file', file, forward)
-end
-
-local function sibling_dir(dir, forward)
-  return sibling('directory', dir, forward)
 end
 
 function M.current_working_directory()
@@ -157,13 +153,13 @@ end
 function M.sibling_across_dirs(file, forward)
   local dir = M.parent(file)
 
-  local sibling_file_same_directory = sibling_file(file, forward)
+  local sibling_file_same_directory = sibling('file', file, forward)
 
   if sibling_file_same_directory ~= nil then
     return sibling_file_same_directory
   end
 
-  local sibling_directory = sibling_dir(dir, forward)
+  local sibling_directory = sibling('directory', dir, forward)
 
   if sibling_directory == nil then return end
 
