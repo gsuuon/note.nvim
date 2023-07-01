@@ -208,7 +208,7 @@ local function insert_timestamp(marker, pre_indent_child)
 end
 
 local function is_day_note(path)
-  return path:match('%d%d%d%d/%d%d/%d%d') ~= nil
+  return vim.fs.normalize(path):match('%d%d%d%d/%d%d/%d%d') ~= nil
 end
 
 function M.create_global_commands()
