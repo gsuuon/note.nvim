@@ -2,10 +2,12 @@ local util = require('note.util')
 
 local M = {}
 
+--- Checks if a file exists. False for directories.
 function M.exists(path)
   return vim.fn.filereadable(vim.fn.expand(path)) == 1
 end
 
+--- Checks if a directory exists
 function M.dir_exists(path)
     return vim.fn.isdirectory(path) ~= 0
 end
@@ -67,32 +69,38 @@ local function previous_item_in_list(xs, x)
   end
 end
 
-local function sibling_file(file, dir, forward)
-  local results = M.list(dir, {type = 'file'})
+local function sibling(type, path, forward)
+  local parent = M.parent(path)
+  local siblings = M.list(parent, {type = type})
 
-  if not M.exists(file) then -- No current file on disk
+  local exists
+  if type == 'directory' then
+    exists = M.dir_exists(path)
+  else
+    exists = M.exists(path)
+  end
+
+  if not exists then
     if forward then
-      return results[1]
+      return siblings[1]
     else
-      return results[#results]
+      return siblings[#siblings]
     end
   end
 
   if forward then
-    return next_item_in_list(results, file)
+    return next_item_in_list(siblings, path)
   else
-    return previous_item_in_list(results, file)
+    return previous_item_in_list(siblings, path)
   end
 end
 
-local function sibling_dir(dir, forward)
-  local dirs = M.list(M.parent(dir), { type = 'directory'})
+local function sibling_file(file, forward)
+  return sibling('file', file, forward)
+end
 
-  if forward then
-    return next_item_in_list(dirs, dir)
-  else
-    return previous_item_in_list(dirs, dir)
-  end
+local function sibling_dir(dir, forward)
+  return sibling('directory', dir, forward)
 end
 
 function M.current_working_directory()
@@ -149,7 +157,7 @@ end
 function M.sibling_across_dirs(file, forward)
   local dir = M.parent(file)
 
-  local sibling_file_same_directory = sibling_file(file, dir, forward)
+  local sibling_file_same_directory = sibling_file(file, forward)
 
   if sibling_file_same_directory ~= nil then
     return sibling_file_same_directory
