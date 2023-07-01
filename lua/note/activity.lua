@@ -14,14 +14,21 @@ local function add_activity_timestamp(item, lines, child)
       marker = '*',
       body = 'activity'
     })
+
+    local timestamp = items.add_child(activity, {
+      marker = '*',
+      body = util.timestamp()
+    })
+
+    return items.add_child(timestamp, child)
+  else
+    local timestamp = items.add_last_child(activity, {
+      marker = '*',
+      body = util.timestamp()
+    }, lines)
+
+    return items.add_child(timestamp, child)
   end
-
-  local timestamp = items.add_last_child(activity, {
-    marker = '*',
-    body = util.timestamp()
-  }, lines)
-
-  return items.add_child(timestamp, child)
 end
 
 ---@param item Item
