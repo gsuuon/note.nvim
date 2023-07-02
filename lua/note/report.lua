@@ -29,6 +29,14 @@ local task_status = {
   ['='] = 'paused',
 }
 
+local function insert_or_create(tbl, list_field, value)
+  if type(tbl[list_field]) == 'table' then
+    table.insert(tbl[list_field], value)
+  else
+    tbl[list_field] = { value }
+  end
+end
+
 function M.generate(lines)
   local report = {
     tasks = {
@@ -44,6 +52,8 @@ function M.generate(lines)
   local current_section = {
     items = {},
   }
+
+  local last_item
 
   for row1, line in ipairs(lines) do
     local item = items.parse_item(line, row1 - 1)
@@ -62,19 +72,15 @@ function M.generate(lines)
       end
 
       local type = get_item_type(item)
+      item.type = type
 
       if type == 'task' then
+        table.insert(current_section.items, item)
+
         local status = task_status[item.marker]
-        table.insert(
-          current_section.items,
-          vim.tbl_extend('force', item, {type = type})
-        )
         table.insert(report.tasks[status], item)
       elseif type == 'property' then
-        table.insert(
-          current_section.items,
-          vim.tbl_extend('force', item, {type = type})
-        )
+        table.insert(current_section.items, item)
       elseif type == 'section' then
         if #current_section.items > 0 or current_section.title then
           table.insert(report.sections, current_section)
@@ -86,7 +92,17 @@ function M.generate(lines)
           items = {}
         }
       end
+
+      if last_item ~= nil
+          and type ~= 'section'
+          and items.relative_depth(last_item, item) == 1
+      then
+        insert_or_create(last_item, 'children', item)
+        item.parent = last_item
+      end
     end
+
+    last_item = item
   end
 
   table.insert(report.sections, current_section)
