@@ -63,14 +63,28 @@ function M.generate(lines)
 
       local type = get_item_type(item)
 
-      table.insert(
-        current_section.items,
-        vim.tbl_extend('force', item, {type = type})
-      )
-
       if type == 'task' then
         local status = task_status[item.marker]
+        table.insert(
+          current_section.items,
+          vim.tbl_extend('force', item, {type = type})
+        )
         table.insert(report.tasks[status], item)
+      elseif type == 'property' then
+        table.insert(
+          current_section.items,
+          vim.tbl_extend('force', item, {type = type})
+        )
+      elseif type == 'section' then
+        if #current_section.items > 0 or current_section.title then
+          table.insert(report.sections, current_section)
+        end
+
+        current_section = {
+          title = item.body,
+          depth = #item.marker,
+          items = {}
+        }
       end
     end
   end
