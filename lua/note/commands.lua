@@ -406,7 +406,11 @@ function M.create_buffer_commands()
       local sections = {}
 
       for _, section in ipairs(data.sections) do
-        table.insert(sections, section.title .. ': ' .. #section.items .. ' item(s)')
+        table.insert(
+          sections,
+          table.concat(section.scope, '/')
+            .. ': ' .. #section.items .. ' item(s)'
+        )
       end
 
       vim.notify(table.concat(tasks, '\n'), nil, {title = 'tasks'})
