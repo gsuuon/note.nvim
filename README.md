@@ -114,6 +114,7 @@ require('note').setup({
 `NoteMarkItemChildren <marker>` — The cursor item and all children with a matching marker get marked  
 `NoteGoLink` — Follow the link under cursor  
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
+`NoteReport` — Notify with a summary of the current note  
 
 #### Daily notes
 `NotePrevious` — Edit the previous daily note  
