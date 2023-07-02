@@ -408,7 +408,7 @@ function M.create_buffer_commands()
       for _, section in ipairs(data.sections) do
         table.insert(
           sections,
-          table.concat(section.scope, '/')
+          table.concat(section.scope or {'<top>'}, '/')
             .. ': ' .. #section.items .. ' item(s)'
         )
       end
