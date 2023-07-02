@@ -395,7 +395,22 @@ function M.create_buffer_commands()
     0,
     'NoteReport',
     function()
-      buf_split(vim.inspect(report.generate(files.current_lines())))
+      local data = report.generate(files.current_lines())
+
+      local tasks = {}
+
+      for status, status_tasks in pairs(data.tasks) do
+        table.insert(tasks, status .. ': ' .. #status_tasks)
+      end
+
+      local sections = {}
+
+      for _, section in ipairs(data.sections) do
+        table.insert(sections, section.title .. ': ' .. #section.items .. ' item(s)')
+      end
+
+      vim.notify(table.concat(tasks, '\n'), nil, {title = 'tasks'})
+      vim.notify(table.concat(sections, '\n'), nil, {title = 'sections'})
     end,
     {}
   )

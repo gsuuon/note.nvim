@@ -17,7 +17,7 @@ local function get_item_type(item)
     return 'property'
   elseif item.marker:match('[%-%=%,%.]') then
     return 'task'
-  elseif item.marker == '#' then
+  elseif item.marker:match('^#+$') then
     return 'section'
   end
 end
