@@ -52,7 +52,9 @@ function M.generate(lines)
   local current_section = {
     start_row = 0,
     items = {},
+    depth = -1,
   }
+  local section_scope = {}
 
   local last_item
 
@@ -93,12 +95,27 @@ function M.generate(lines)
           )
         end
 
-        current_section = {
+        local new_section = {
           title = item.body,
           depth = #item.marker,
           start_row = row,
           items = {}
         }
+
+        local scope_last = section_scope[#section_scope]
+
+        while scope_last and new_section.depth <= scope_last.depth do
+          table.remove(section_scope, #section_scope)
+          scope_last = section_scope[#section_scope]
+        end
+
+        table.insert(section_scope, new_section)
+
+        new_section.scope = vim.tbl_map(function(s)
+          return s.title
+        end, section_scope)
+
+        current_section = new_section
       end
 
       if last_item ~= nil
