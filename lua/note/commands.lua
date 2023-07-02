@@ -107,7 +107,7 @@ local function goto_previous_note() goto_note(false) end
 local function goto_find_item(args)
   local item = find_item({
     marker = args.fargs[1],
-    body = args.fargs[2]
+    body = args.fargs[2] or '.'
   })
 
   if item == nil then return end
