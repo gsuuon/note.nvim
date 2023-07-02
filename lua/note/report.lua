@@ -50,13 +50,15 @@ function M.generate(lines)
 
   local text_block = {}
   local current_section = {
+    start_row = 0,
     items = {},
   }
 
   local last_item
 
   for row1, line in ipairs(lines) do
-    local item = items.parse_item(line, row1 - 1)
+    local row = row1 - 1
+    local item = items.parse_item(line, row)
     if item == nil then
       table.insert(text_block, line)
     else
@@ -83,12 +85,18 @@ function M.generate(lines)
         table.insert(current_section.items, item)
       elseif type == 'section' then
         if #current_section.items > 0 or current_section.title then
-          table.insert(report.sections, current_section)
+          current_section.stop_row = row - 1
+
+          table.insert(
+            report.sections,
+            current_section
+          )
         end
 
         current_section = {
           title = item.body,
           depth = #item.marker,
+          start_row = row,
           items = {}
         }
       end
