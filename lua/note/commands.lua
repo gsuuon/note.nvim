@@ -52,7 +52,6 @@ local function follow_link_at_cursor()
   if link == nil then return end
 
   if link.file ~= nil then
-
     local filepath
     if util.starts_with(link.file, '/') then
       filepath = files.join_paths({
@@ -73,7 +72,7 @@ local function follow_link_at_cursor()
 
   local item = items.scan_for_item(
     link,
-    cursor.row,
+    (link.file == nil) and cursor.row or 0,
     files.current_lines()
   )
 
