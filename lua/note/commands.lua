@@ -33,6 +33,16 @@ local function current_note_root()
   })
 end
 
+---@return string | nil
+local function path_relative_to_root(path)
+  local resolved = vim.fn.resolve(path)
+  local root = vim.fn.resolve(current_note_root())
+
+  if util.starts_with(resolved, root) then
+    return resolved:sub(#root + 1)
+  end
+end
+
 ---@param target Target
 local function find_item(target)
   return items.scan_for_item(
@@ -429,8 +439,18 @@ function M.create_buffer_commands()
     0,
     'NoteRefCreate',
     function()
-      ref.create_ref(items.cursor_item())
+      local relative_path = path_relative_to_root(files.current_file())
+      local item = items.cursor_item()
+      if item == nil then return end
+      ref.create_ref(item, relative_path)
     end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteRefPaste',
+    function() ref.insert_ref() end,
     {}
   )
 
