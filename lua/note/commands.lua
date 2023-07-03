@@ -4,6 +4,7 @@ local files = require('note.files')
 local items = require('note.items')
 local activity = require('note.activity')
 local report = require('note.report')
+local ref = require('note.ref')
 
 local M = {}
 
@@ -420,6 +421,15 @@ function M.create_buffer_commands()
 
       vim.notify(table.concat(tasks, '\n'), nil, {title = 'tasks'})
       vim.notify(table.concat(sections, '\n'), nil, {title = 'sections'})
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteRefCreate',
+    function()
+      ref.create_ref(items.cursor_item())
     end,
     {}
   )
