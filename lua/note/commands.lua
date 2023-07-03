@@ -70,13 +70,19 @@ local function follow_link_at_cursor()
 
   link.body = util.pattern_to_case_insensitive(link.body)
 
+  local lines = files.current_lines()
+
   local item = items.scan_for_item(
     link,
     (link.file == nil) and cursor.row or 0,
-    files.current_lines()
+    lines
   )
 
   if item == nil then return end
+
+  if link.action == 'parent' then
+    item = items.parent(item, lines) or item
+  end
 
   util.cursor_set(item.position, link.file == nil)
 end
