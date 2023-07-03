@@ -282,30 +282,41 @@ function M.add_item(item)
   return item
 end
 
---- Get link at column of line
+---@class Link
+---@field marker string
+---@field body string
+---@field col number
+---@field file? string
+---@field action? string
+
+--- Finds links in line, returning the one that spans col
 ---@param line string
 ---@param col number 0-indexed col of line
----@return { marker: string, body: string, col: number, file?: string } | nil
+---@return Link
 function M.get_link_at_col(line, col)
   local start, stop = line:find('%[.-|.-%]')
-  col = col + 1
+  local col1 = col + 1
 
   while start ~= nil do
-    if col >= start and col <= stop then
-      local head, body = line:sub(start, stop):match('%[(.-)|(.-)%]')
+    if col1 >= start and col1 <= stop then
+      local head, tail = line:sub(start, stop):match('%[(.-)|(.-)%]')
 
       local _, file_stop, file = head:find('%((.+)%)')
       local marker = head:match('.+', file_stop and file_stop + 1 or 1)
 
+      local body, action = tail:match('(.-)|(.-)$')
+      if body == nil then body = tail end
+
       return {
         marker = marker,
-        file = file,
         body = body,
-        col = start - 1
+        file = file,
+        col = start - 1,
+        action = action,
       }
     end
 
-    start, stop = line:find('%[.+|.+%]', stop)
+    start, stop = line:find('%[.-|.-%]', stop)
   end
 end
 
