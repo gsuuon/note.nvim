@@ -114,6 +114,7 @@ require('note').setup({
 `NoteGoLink` — Follow the link under cursor  
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
 `NoteReport` — Notify with a summary of the current note  
+`NoteLinkPinCommit` — Modify the link under the cursor to pin it to a specific file and commit  
 
 #### Refs
 `NoteRefCreate` — Create a ref for the item under the cursor  
