@@ -84,11 +84,12 @@ local function follow_link_at_cursor()
 
       local lines = files.commit_lines(link.file.commit, filepath)
       -- TODO check if commit_lines failed
-      local bufnr = vim.api.nvim_create_buf(true, true)
+
+      local bufname = filepath .. '@' .. link.file.commit
+      local bufnr = vim.fn.bufnr(bufname, true)
 
       vim.api.nvim_buf_set_option(bufnr, 'buftype', 'nofile')
       vim.api.nvim_buf_set_option(bufnr, 'filetype', 'note')
-      vim.api.nvim_buf_set_name(bufnr, filepath .. '@' .. link.file.commit)
       vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
 
       vim.cmd.b(bufnr)
