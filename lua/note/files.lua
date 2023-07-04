@@ -12,6 +12,7 @@ function M.dir_exists(path)
     return vim.fn.isdirectory(path) ~= 0
 end
 
+---@param paths string[]
 function M.join_paths(paths)
   return vim.fs.normalize(vim.fn.simplify(table.concat(paths, '\\')))
 end

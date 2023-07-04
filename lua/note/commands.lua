@@ -64,15 +64,15 @@ local function follow_link_at_cursor()
 
   if link.file ~= nil then
     local filepath
-    if util.starts_with(link.file, '/') then
+    if util.starts_with(link.file.path, '/') then
       filepath = files.join_paths({
         current_note_root(),
-        link.file,
+        link.file.path,
       })
     else
       filepath = files.join_paths({
         files.current_file_directory(),
-        link.file,
+        link.file.path,
       })
     end
 

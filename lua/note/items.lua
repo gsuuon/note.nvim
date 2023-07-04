@@ -16,6 +16,11 @@ local M = {}
 ---@field body string pattern to search for
 ---@field marker string marker character or marker class
 
+---@class Link:Target
+---@field col number
+---@field file? { path: string, commit?: string }
+---@field action? string
+
 --- Try to parse a line as an item
 ---@param line string
 ---@param row number
@@ -290,13 +295,6 @@ function M.add_item(item, bufnr)
   return item
 end
 
----@class Link
----@field marker string
----@field body string
----@field col number
----@field file? string
----@field action? string
-
 --- Finds links in line, returning the one that spans col
 ---@param line string
 ---@param col number 0-indexed col of line
@@ -318,7 +316,9 @@ function M.get_link_at_col(line, col)
       return {
         marker = marker,
         body = body,
-        file = file,
+        file = {
+          path = file
+        },
         col = start - 1,
         action = action,
       }
