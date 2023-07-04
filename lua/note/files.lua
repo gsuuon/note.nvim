@@ -115,8 +115,13 @@ function M.current_file()
   return vim.fs.normalize(vim.fn.expand('%:p'))
 end
 
+function M.lines(bufnr)
+  return vim.api.nvim_buf_get_lines(bufnr or 0, 0, -1, false)
+end
+
+-- TODO remove
 function M.current_lines()
-  return vim.api.nvim_buf_get_lines(0, 0, -1, false)
+  return M.lines(0)
 end
 
 ---Tries to get the line at row of buffer

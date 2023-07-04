@@ -114,6 +114,7 @@ function M.insert_ref(ref)
   )
 end
 
+---@return string | nil
 local function get_item_ref(item, lines)
   local ref_item = items.find_child(function(x)
     return x.marker == '*' and x.body:match('ref:.+')
@@ -134,6 +135,69 @@ function M.yank_ref(item, current_file)
     ref = ref,
     file = current_file
   }
+end
+
+function M.yank_item(item, current_file)
+  local ref = get_item_ref(item, files.current_lines())
+
+  if ref == nil then
+    ref = M.create_ref_info_item(item, current_file)
+  end
+
+  M.saved_item = {
+    marker = item.marker,
+    body = item.body,
+    ref = {
+      ref = ref,
+      file = current_file
+    }
+  }
+end
+
+---@param item Item | nil
+function M.paste_item(item, current_file, root)
+  local saved_item = {
+    marker = M.saved_item.marker,
+    body = M.saved_item.body,
+  }
+
+  local added_item
+  if item == nil then
+    added_item = items.add_item(vim.tbl_extend('force', saved_item, {
+      position = util.cursor()
+    }))
+  else
+    added_item = items.add_child(item, saved_item)
+  end
+
+  items.add_child(added_item, {
+    marker = '*',
+    body = create_ref_link(M.saved_item.ref)
+  })
+
+  local pasted_ref = M.create_ref_info_item(added_item, current_file)
+
+  vim.cmd.split(files.join_paths({root, M.saved_item.ref.file}))
+
+  local target = {
+    marker = '*',
+    body = 'ref:' .. M.saved_item.ref.ref
+  }
+
+  local lines = files.lines()
+  local ref_item = items.find_target(target, lines)
+
+  if ref_item == nil then
+    error('Original ref not found: ' .. vim.inspect(M.saved_item.ref))
+  end
+
+  local original_item = items.parent(ref_item, lines)
+  if original_item == nil then return end
+
+  items.add_child(original_item, {
+    marker = '*',
+    body = create_ref_link({ref = pasted_ref, file = current_file})
+  })
 end
 
 return M

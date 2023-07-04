@@ -468,6 +468,33 @@ function M.create_buffer_commands()
 
   vim.api.nvim_buf_create_user_command(
     0,
+    'NoteItemLinkedYank',
+    function()
+      local relative_path = path_relative_to_root(files.current_file())
+
+      local item = items.cursor_item()
+      if item == nil then return end
+
+      ref.yank_item(item, relative_path)
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteItemLinkedPaste',
+    function()
+      ref.paste_item(
+        items.cursor_item(),
+        path_relative_to_root(files.current_file()),
+        current_note_root()
+      )
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
     'NoteTime',
     function(args)
       insert_timestamp(args.fargs[1] or '*', true)

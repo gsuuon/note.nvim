@@ -193,8 +193,16 @@ local function find_item_matching_iter(target, packed_iter_lines)
   end
 end
 
+function M.find_target(target, lines)
+  return M.find_item(function(item)
+    return match_item_target(target, item)
+  end, lines)
+end
+
 --- Finds the item first scanning down from row, then up from row.
+---@param target Target
 ---@param row number 0-indexed row
+---@param lines string[]
 function M.scan_for_item(target, row, lines)
   -- Scan down from row
   local item = find_item_matching_iter(
@@ -229,7 +237,7 @@ end
 ---@param parent Item
 ---@param child { marker: string, body: string }
 ---@return Item
-function M.add_child(parent, child)
+function M.add_child(parent, child, bufnr)
   local child_item = vim.tbl_extend('force', child, {
     position = {
       col = parent.position.col + vim.o.sw,
@@ -237,7 +245,7 @@ function M.add_child(parent, child)
     }
   })
 
-  M.add_item(child_item)
+  M.add_item(child_item, bufnr)
 
   return child_item
 end
@@ -272,11 +280,11 @@ function M.set_item(item, update)
 end
 
 ---Inserts item at its position
-function M.add_item(item)
+function M.add_item(item, bufnr)
   files.set_line(
     item.position.row,
     M.item_as_line(item),
-    nil,
+    bufnr,
     true
   )
   return item
