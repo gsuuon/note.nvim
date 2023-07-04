@@ -442,7 +442,19 @@ function M.create_buffer_commands()
       local relative_path = path_relative_to_root(files.current_file())
       local item = items.cursor_item()
       if item == nil then return end
-      ref.create_ref(item, relative_path)
+      ref.create_ref_info_item(item, relative_path)
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteRefYank',
+    function()
+      local relative_path = path_relative_to_root(files.current_file())
+      local item = items.cursor_item()
+      if item == nil then return end
+      ref.yank_ref(item, relative_path)
     end,
     {}
   )

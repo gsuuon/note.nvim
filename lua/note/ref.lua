@@ -1,5 +1,6 @@
 local util = require('note.util')
 local items = require('note.items')
+local files = require('note.files')
 
 local M = {}
 
@@ -60,7 +61,7 @@ end
 ---@param item Item
 ---@param file? string
 ---@return string ref
-function M.create_ref(item, file)
+function M.create_ref_info_item(item, file)
   local ref = create_ref_id(12)
 
   items.add_child(item, {
@@ -111,6 +112,28 @@ function M.insert_ref(ref)
     pos.col,
     { ref_link }
   )
+end
+
+local function get_item_ref(item, lines)
+  local ref_item = items.find_child(function(x)
+    return x.marker == '*' and x.body:match('ref:.+')
+  end, item, lines)
+
+  if ref_item == nil then return end
+
+  local ref = ref_item.body:match('ref:(.+)')
+  return ref
+end
+
+---Yank the ref of the item to be used with NoteRefPaste
+function M.yank_ref(item, current_file)
+  local ref = get_item_ref(item, files.current_lines())
+  if ref == nil then return end
+
+  M.saved_ref = {
+    ref = ref,
+    file = current_file
+  }
 end
 
 return M
