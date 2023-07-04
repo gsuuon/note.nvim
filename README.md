@@ -133,6 +133,7 @@ require('note').setup({
 ### Note buffers
 `<prefix>t` — NoteTime  
 `<prefix>l` — NoteGoLink  
+`<prefix>c` — NoteCurrentItem  
 `<prefix>m<marker>` — NoteMarkItem <marker>  
 `<prefix>M<marker>` — NoteMarkItemChildren <marker>  
 `<prefix>f<marker>` — NoteFindItem <marker> .  
