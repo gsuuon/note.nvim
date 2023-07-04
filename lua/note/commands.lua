@@ -223,45 +223,72 @@ local function is_day_note(path)
   return vim.fs.normalize(path):match('%d%d%d%d/%d%d/%d%d') ~= nil
 end
 
-function M.create_global_commands()
-  --- Gets the space based on current file, then cwd, else first item in config.spaces
+local function open_note_day()
+  local notes_root = current_note_root()
 
-  local function open_note_day()
-    local notes_root = current_note_root()
+  local path_note_today = files.join_paths({
+    notes_root,
+    os.date("%Y/%m/%d")
+  })
 
-    local path_note_today = files.join_paths({
+  vim.cmd('e ' .. path_note_today)
+
+  local lines = files.current_lines()
+
+  if #lines == 1 and lines[1] == '' then
+    local template_path = files.join_paths({
       notes_root,
-      os.date("%Y/%m/%d")
+      '/.note/daily_template'
     })
 
-    vim.cmd('e ' .. path_note_today)
-
-    local lines = files.current_lines()
-
-    if #lines == 1 and lines[1] == '' then
-      local template_path = files.join_paths({
-        notes_root,
-        '/.note/daily_template'
-      })
-
-      if files.exists(template_path) then
-        vim.api.nvim_put(
-          vim.fn.readfile(template_path),
-          'l',
-          false,
-          false
-        )
-      else
-        vim.api.nvim_put({
-          '# Goal',
-          '',
-          '# Tasks',
-          '',
-          '# Notes',
-        }, 'l', false, false)
-      end
+    if files.exists(template_path) then
+      vim.api.nvim_put(
+        vim.fn.readfile(template_path),
+        'l',
+        false,
+        false
+      )
+    else
+      vim.api.nvim_put({
+        '# Goal',
+        '',
+        '# Tasks',
+        '',
+        '# Notes',
+      }, 'l', false, false)
     end
   end
+end
+
+local function link_item_today(args)
+  if args.fargs[1] == nil then return end
+
+  local relative_path = path_relative_to_root(files.current_file())
+
+  local cursor_item = items.cursor_item()
+  if cursor_item == nil then return end
+
+  ref.yank_item(cursor_item, relative_path)
+  open_note_day()
+
+  local target_item = find_item({
+    marker = args.fargs[1],
+    body = args.fargs[2] or '.'
+  })
+
+  if target_item == nil then
+    -- TODO just copy to end of file
+  else
+    ref.paste_item(
+      target_item,
+      path_relative_to_root(files.current_file()),
+      current_note_root()
+    )
+  end
+end
+
+function M.create_global_commands()
+  --- Gets the space based on current file, then cwd, else first item in config.spaces
 
   local function open_note_index()
     vim.cmd('e ' .. files.join_paths({current_note_root(), 'index'}))
@@ -510,6 +537,13 @@ function M.create_buffer_commands()
       )
     end,
     {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteItemLinkToday',
+    link_item_today,
+    {nargs='+'}
   )
 
   vim.api.nvim_buf_create_user_command(
