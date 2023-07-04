@@ -208,7 +208,14 @@ end
 ---@param target Target
 ---@param row number 0-indexed row
 ---@param lines string[]
-function M.scan_for_item(target, row, lines)
+---@param case_sensitive boolean
+function M.scan_for_item(target, row, lines, case_sensitive)
+  if not case_sensitive then
+    target = vim.tbl_extend('force', target, {
+      body = util.pattern_to_case_insensitive(target.body)
+    })
+  end
+
   -- Scan down from row
   local item = find_item_matching_iter(
     target,
@@ -218,6 +225,7 @@ function M.scan_for_item(target, row, lines)
   )
   if item ~= nil then return item end
 
+  if row == 0 then return end
   -- Scan up from row
   item = find_item_matching_iter(
     target,
@@ -243,9 +251,11 @@ end
 ---@param child { marker: string, body: string }
 ---@return Item
 function M.add_child(parent, child, bufnr)
+  local is_section = parent.marker:sub(1, 1) == '#'
+
   local child_item = vim.tbl_extend('force', child, {
     position = {
-      col = parent.position.col + vim.o.sw,
+      col = (is_section and 0) or parent.position.col + vim.o.sw,
       row = parent.position.row + 1
     }
   })

@@ -98,14 +98,14 @@ local function follow_link_at_cursor()
     end
   end
 
-  link.body = util.pattern_to_case_insensitive(link.body)
-
   local lines = files.current_lines()
 
+  -- TODO if ref can make case sensitive and add case sensitive refs
   local item = items.scan_for_item(
     link,
     (link.file == nil) and cursor.row or 0,
-    lines
+    lines,
+    false
   )
 
   if item == nil then return end
@@ -269,15 +269,20 @@ local function link_item_today(args)
   if cursor_item == nil then return end
 
   ref.yank_item(cursor_item, relative_path)
+
   open_note_day()
 
-  local target_item = find_item({
+  local target = {
     marker = args.fargs[1],
     body = args.fargs[2] or '.'
-  })
+  }
+
+  local lines = files.current_lines()
+  local target_item = items.scan_for_item(target, 0, lines, false)
 
   if target_item == nil then
     -- TODO just copy to end of file
+    vim.notify(vim.inspect(target), vim.log.levels.ERROR, { title = 'Item not found' })
   else
     ref.paste_item(
       target_item,
