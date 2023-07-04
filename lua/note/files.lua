@@ -216,4 +216,22 @@ function M.find_containing_directory(directory, directories)
   )
 end
 
+function M.current_commit(root)
+  local proc = vim.system(
+    {'git', 'rev-parse', '--short=10', 'HEAD' },
+    {
+      text = true,
+      cwd = root
+    }
+  )
+
+  local out = proc:wait().stdout
+
+  if out == nil or util.starts_with(out, 'fatal') then
+    return nil, out
+  end
+
+  return (out:gsub('\n$', ''))
+end
+
 return M

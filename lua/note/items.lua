@@ -18,6 +18,7 @@ local M = {}
 
 ---@class Link:Target
 ---@field col number
+---@field col_stop number
 ---@field file? { path: string, commit?: string }
 ---@field action? string
 
@@ -357,12 +358,44 @@ function M.get_link_at_col(line, col)
         body = body,
         file = file,
         col = start - 1,
+        col_stop = stop,
         action = action,
       }
     end
 
     start, stop = line:find('%[.-|.-%]', stop)
   end
+end
+
+---@param link Link
+function M.link_to_str(link)
+  -- [(f@c)marker|body|action]
+  local file_part
+  if link.file.path == nil then
+    file_part = ''
+  else
+    if link.file.commit == nil then
+      file_part = link.file.path
+    else
+      file_part = link.file.path .. '@' .. link.file.commit
+    end
+
+    file_part = '(' .. file_part .. ')'
+  end
+
+  local action_part
+  if link.action == nil then
+    action_part = ''
+  else
+    action_part = '|' .. link.action
+  end
+
+  return ('[%s%s|%s%s]'):format(
+    file_part,
+    link.marker,
+    link.body,
+    action_part
+  )
 end
 
 return M

@@ -557,6 +557,55 @@ function M.create_buffer_commands()
 
   vim.api.nvim_buf_create_user_command(
     0,
+    'NoteLinkPinCommit',
+    function()
+      local pos = util.cursor()
+      local link = items.get_link_at_col(
+        vim.api.nvim_get_current_line(),
+        pos.col
+      )
+
+      if link == nil then return end
+
+      local update_link_file
+      if link.file == nil or link.file.path == nil then
+        update_link_file = {
+          path = path_relative_to_root(files.current_file()),
+        }
+      end
+
+      local current_commit, err = files.current_commit(current_note_root())
+      if current_commit == nil then
+        vim.notify(
+          err or '',
+          vim.log.levels.ERROR,
+          { title = 'git error' }
+        )
+        return
+      end
+
+      update_link_file.commit = current_commit
+
+      local link_str = items.link_to_str(vim.tbl_extend(
+        'force',
+        link,
+        { file = update_link_file }
+      ))
+
+      vim.api.nvim_buf_set_text(
+        0,
+        pos.row,
+        link.col,
+        pos.row,
+        link.col_stop,
+        {link_str}
+      )
+    end,
+    {}
+  )
+
+  vim.api.nvim_buf_create_user_command(
+    0,
     'NoteTime',
     function(args)
       insert_timestamp(args.fargs[1] or '*', true)
