@@ -38,13 +38,12 @@ Some special symbols will also highlight to help with readability:
 `(!)` — warn -- draw attention to something important  
 
 ### Links
-Links to items can be created with `[(<file>)<marker>|<body>]`. They're just shortcuts that search for a target item, first by searching downwards from the link and then upwards.
+Links to items can be created with `[(<file>)<marker>|<body>]`. They're shortcuts that search for a target item, first by searching downwards from the link and then upwards. The file part can point to a specific commit.
 
-`<body>` behaves like a case-insensitive `string.match` against items.
-
-`(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. If the file part starts with `/` then the path is resolved relative to the note root.
-
-`<marker>` is a specific marker (e.g. `-`, `*`) or one of these special characters:
+- `<body>` behaves like a case-insensitive `string.match` against items.
+- `(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. If the file part starts with `/` then the path is resolved relative to the note root.
+- `(<file>@<commit>)` links to the file at a specific commit. The git root is expected to be the note root.  
+- `<marker>` is a specific marker (e.g. `-`, `*`) or one of these special characters:
 
 `s` — section -- matches any number of #'s  
 `p` — property -- matches any property marker  
