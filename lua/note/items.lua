@@ -305,6 +305,18 @@ function M.add_item(item, bufnr)
   return item
 end
 
+function M.find_or_create_child(parent, child, lines)
+  local existing = M.find_child(function(item)
+    return item.marker == child.marker and item.body == child.body
+  end, parent, lines)
+
+  if existing then
+    return existing
+  end
+
+  return M.add_child(parent, child)
+end
+
 --- Finds links in line, returning the one that spans col
 ---@param line string
 ---@param col number 0-indexed col of line

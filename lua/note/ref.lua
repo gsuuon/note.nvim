@@ -156,6 +156,11 @@ function M.paste_item(item, current_file, root)
     body = M.saved_item.body,
   }
 
+  local links_info_item = {
+    marker = '*',
+    body = 'links'
+  }
+
   local added_item
   if item == nil then
     added_item = items.add_item(vim.tbl_extend('force', saved_item, {
@@ -165,7 +170,13 @@ function M.paste_item(item, current_file, root)
     added_item = items.add_child(item, saved_item)
   end
 
-  items.add_child(added_item, {
+  local added_item_links = items.find_or_create_child(
+    added_item,
+    links_info_item,
+    files.current_lines()
+  )
+
+  items.add_child(added_item_links, {
     marker = '*',
     body = create_ref_link(M.saved_item.ref, M.saved_item.file)
   })
@@ -189,7 +200,13 @@ function M.paste_item(item, current_file, root)
   local original_item = items.parent(ref_item, lines)
   if original_item == nil then return end
 
-  items.add_child(original_item, {
+  local original_item_links = items.find_or_create_child(
+    original_item,
+    links_info_item,
+    lines
+  )
+
+  items.add_child(original_item_links, {
     marker = '*',
     body = create_ref_link(pasted_ref, current_file)
   })
