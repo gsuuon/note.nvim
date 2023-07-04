@@ -86,16 +86,6 @@ function M.tbl_iter(tbl, start, stop)
   end
 end
 
----Convert a pattern to a case insensitive pattern (a -> [Aa])
----@param pat string
-function M.pattern_to_case_insensitive(pat)
-  return pat:gsub('(%a)',
-    function (l)
-      return '[' .. l:upper() .. l:lower() .. ']'
-    end
-  )
-end
-
 function M.iter(xs)
   return table.pack(ipairs(xs))
 end

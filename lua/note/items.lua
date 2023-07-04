@@ -205,15 +205,25 @@ function M.find_target(target, lines)
   end, lines)
 end
 
+---Convert a pattern to a case insensitive pattern (a -> [Aa]) and escape dashes
+---@param pat string
+local function cannon_pattern(pat)
+  return (pat:gsub('(%a)',
+    function (l)
+      return '[' .. l:upper() .. l:lower() .. ']'
+    end
+  ):gsub('%-', '%%-'))
+end
+
 --- Finds the item first scanning down from row, then up from row.
 ---@param target Target
 ---@param row number 0-indexed row
 ---@param lines string[]
----@param case_sensitive boolean
-function M.scan_for_item(target, row, lines, case_sensitive)
-  if not case_sensitive then
+---@param is_pattern boolean body is a pattern, do not convert to case sensitive and escape dash
+function M.scan_for_item(target, row, lines, is_pattern)
+  if not is_pattern then
     target = vim.tbl_extend('force', target, {
-      body = util.pattern_to_case_insensitive(target.body)
+      body = cannon_pattern(target.body)
     })
   end
 
