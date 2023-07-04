@@ -120,6 +120,10 @@ function M.lines(bufnr)
   return vim.api.nvim_buf_get_lines(bufnr or 0, 0, -1, false)
 end
 
+function M.commit_lines(commit, filepath)
+  return vim.fn.systemlist({'git', 'show', commit .. ':' .. filepath})
+end
+
 -- TODO remove
 function M.current_lines()
   return M.lines(0)

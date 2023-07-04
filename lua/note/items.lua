@@ -307,7 +307,24 @@ function M.get_link_at_col(line, col)
     if col1 >= start and col1 <= stop then
       local head, tail = line:sub(start, stop):match('%[(.-)|(.-)%]')
 
-      local _, file_stop, file = head:find('%((.+)%)')
+      local _, file_stop, file_part = head:find('%((.+)%)')
+
+      local file
+      if file_part ~= nil then
+        local path, commit = file_part:match('(.+)@(.+)')
+
+        if commit == nil then
+          file = {
+            path = file_part 
+          }
+        else
+          file = {
+            path = path,
+            commit = commit
+          }
+        end
+      end
+
       local marker = head:match('.+', file_stop and file_stop + 1 or 1)
 
       local body, action = tail:match('(.-)|(.-)$')
@@ -316,9 +333,7 @@ function M.get_link_at_col(line, col)
       return {
         marker = marker,
         body = body,
-        file = {
-          path = file
-        },
+        file = file,
         col = start - 1,
         action = action,
       }

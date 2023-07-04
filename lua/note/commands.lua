@@ -52,6 +52,20 @@ local function find_item(target)
   )
 end
 
+local function link_filepath(link)
+  if util.starts_with(link.file.path, '/') then
+    return files.join_paths({
+      current_note_root(),
+      link.file.path
+    })
+  end
+
+  return files.join_paths({
+    files.current_file_directory(),
+    link.file.path
+  })
+end
+
 local function follow_link_at_cursor()
   local cursor = util.cursor()
 
@@ -63,20 +77,24 @@ local function follow_link_at_cursor()
   if link == nil then return end
 
   if link.file ~= nil then
-    local filepath
-    if util.starts_with(link.file.path, '/') then
-      filepath = files.join_paths({
-        current_note_root(),
-        link.file.path,
-      })
-    else
-      filepath = files.join_paths({
-        files.current_file_directory(),
-        link.file.path,
-      })
-    end
+    local filepath = link_filepath(link)
 
-    vim.cmd.edit(filepath)
+    if link.file.commit then
+      filepath = path_relative_to_root(filepath):gsub('^/','')
+
+      local lines = files.commit_lines(link.file.commit, filepath)
+      -- TODO check if commit_lines failed
+      local bufnr = vim.api.nvim_create_buf(true, true)
+
+      vim.api.nvim_buf_set_option(bufnr, 'buftype', 'nofile')
+      vim.api.nvim_buf_set_option(bufnr, 'filetype', 'note')
+      vim.api.nvim_buf_set_name(bufnr, filepath .. '@' .. link.file.commit)
+      vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
+
+      vim.cmd.b(bufnr)
+    else
+      vim.cmd.edit(filepath)
+    end
   end
 
   link.body = util.pattern_to_case_insensitive(link.body)
