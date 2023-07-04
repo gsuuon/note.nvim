@@ -116,6 +116,16 @@ require('note').setup({
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
 `NoteReport` — Notify with a summary of the current note  
 
+#### Refs
+`NoteRefCreate` — Create a ref for the item under the cursor  
+`NoteRefPaste` — Paste a link to the last created ref  
+`NoteRefYank` — Yank the ref for the item under the cursor to use with `NoteRefPaste`  
+
+`*Linked*` commands add a ref link from the source item to the target and from target to the source  
+`NoteItemLinkedYank` — Yank the item under the cursor. Creates a ref if one doesn't exist  
+`NoteItemLinkedPaste` — Paste the last LinkedYank item  
+`NoteItemLinkToday <marker> <body>` — Yank the item under the cursor and add it as a child item of marker body in the daily note  
+
 #### Daily notes
 `NotePrevious` — Edit the previous daily note  
 `NoteNext` — Edit the next daily note  
