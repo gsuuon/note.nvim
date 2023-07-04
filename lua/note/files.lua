@@ -120,8 +120,16 @@ function M.lines(bufnr)
   return vim.api.nvim_buf_get_lines(bufnr or 0, 0, -1, false)
 end
 
-function M.commit_lines(commit, filepath)
-  return vim.fn.systemlist({'git', 'show', commit .. ':' .. filepath})
+function M.commit_lines(commit, filepath, root)
+  local proc = vim.system(
+    {'git', 'show', commit .. ':' .. filepath},
+    {
+      text = true,
+      cwd = root
+    }
+  )
+
+  return vim.fn.split(proc:wait().stdout, '\n')
 end
 
 -- TODO remove

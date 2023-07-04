@@ -82,7 +82,11 @@ local function follow_link_at_cursor()
     if link.file.commit then
       filepath = path_relative_to_root(filepath):gsub('^/','')
 
-      local lines = files.commit_lines(link.file.commit, filepath)
+      local lines = files.commit_lines(
+        link.file.commit,
+        filepath,
+        current_note_root()
+      )
       -- TODO check if commit_lines failed
 
       local bufname = filepath .. '@' .. link.file.commit
