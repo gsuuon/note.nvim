@@ -197,11 +197,8 @@ local function add_child(args)
   })
 end
 
-local function make_intermediate_directories()
-  local parent_dir = files.current_file_directory()
-  if not files.dir_exists(parent_dir) then
-    vim.fn.mkdir(parent_dir, 'p')
-  end
+local function make_intermediate_directories(ctx)
+  vim.fn.mkdir(files.parent(ctx.file), 'p')
 end
 
 local function insert_timestamp(marker, pre_indent_child)
