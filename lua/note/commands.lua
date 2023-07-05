@@ -389,7 +389,27 @@ function M.create_buffer_commands()
     0,
     'NoteFindItem',
     goto_find_item,
-    { nargs = '+' }
+    {
+      nargs = '+',
+      complete = function(cur_arg, arg_line)
+        local marker = arg_line:match('^NoteFindItem (.)')
+        if marker ~= 's' then return end
+
+        local lines = files.current_lines()
+
+        local sections = {}
+        for _, line in ipairs(lines) do
+          local _, title = line:match('^(#+) (.+)$')
+          if title ~= nil then
+            table.insert(sections, title)
+          end
+        end
+
+        if cur_arg == '' then return sections end
+
+        return vim.fn.matchfuzzy(sections, cur_arg)
+      end
+    }
   )
 
   vim.api.nvim_buf_create_user_command(
@@ -684,5 +704,7 @@ function M.create_buffer_keymaps(prefix)
     )
   end
 end
+
+-- show(vim.fn.matchfuzzy({'Foo','Bar'}, 'f'))
 
 return M
