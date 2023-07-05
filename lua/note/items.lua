@@ -219,7 +219,7 @@ end
 ---@param target Target
 ---@param row number 0-indexed row
 ---@param lines string[]
----@param is_pattern boolean body is a pattern, do not convert to case sensitive and escape dash
+---@param is_pattern? boolean body is a pattern, do not convert to case sensitive and escape dash
 function M.scan_for_item(target, row, lines, is_pattern)
   if not is_pattern then
     target = vim.tbl_extend('force', target, {
