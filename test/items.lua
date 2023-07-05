@@ -12,49 +12,49 @@ local test_lines = {
 }
 
 local expected_items =
-  { {
-      body = "beep",
-      marker = "-",
-      position = {
-        col = 0,
-        row = 1
-      }
-    }, {
-      body = "boop",
-      marker = ".",
-      position = {
-        col = 1,
-        row = 2
-      }
-    }, {
-      body = "boop",
-      marker = "[",
-      position = {
-        col = 2,
-        row = 3
-      }
-    }, {
-      body = "beep",
-      marker = "-",
-      position = {
-        col = 2,
-        row = 5
-      }
-    }, {
-      body = "boop",
-      marker = "-",
-      position = {
-        col = 0,
-        row = 6
-      }
-    }, {
-      body = "boop",
-      marker = "##",
-      position = {
-        col = 0,
-        row = 7
-      }
-    } }
+{ {
+  body = "beep",
+  marker = "-",
+  position = {
+    col = 0,
+    row = 1
+  }
+}, {
+  body = "boop",
+  marker = ".",
+  position = {
+    col = 1,
+    row = 2
+  }
+}, {
+  body = "boop",
+  marker = "[",
+  position = {
+    col = 2,
+    row = 3
+  }
+}, {
+  body = "beep",
+  marker = "-",
+  position = {
+    col = 2,
+    row = 5
+  }
+}, {
+  body = "boop",
+  marker = "-",
+  position = {
+    col = 0,
+    row = 6
+  }
+}, {
+  body = "boop",
+  marker = "##",
+  position = {
+    col = 0,
+    row = 7
+  }
+} }
 
 ---Utility function to help set test expected values. Sets the register 'x' to a value
 local function to_reg(x)
@@ -112,28 +112,28 @@ local function test_children()
   }
 
   local expected_children =
-    { {
-      body = "c",
-      marker = "*",
-      position = {
-        col = 1,
-        row = 2
-      }
-    }, {
-      body = "c1",
-      marker = "[",
-      position = {
-        col = 1,
-        row = 3
-      }
-    }, {
-      body = "c2",
-      marker = "*",
-      position = {
-        col = 3,
-        row = 4
-      }
-    } }
+  { {
+    body = "c",
+    marker = "*",
+    position = {
+      col = 1,
+      row = 2
+    }
+  }, {
+    body = "c1",
+    marker = "[",
+    position = {
+      col = 1,
+      row = 3
+    }
+  }, {
+    body = "c2",
+    marker = "*",
+    position = {
+      col = 3,
+      row = 4
+    }
+  } }
 
   local first_b = items.find_item_matching_iter({
     marker = '-',

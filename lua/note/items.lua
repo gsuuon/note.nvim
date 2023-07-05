@@ -69,7 +69,7 @@ local function iter_map(map, packed_iterator, stop_at_nil)
   end
   local control = last
 
-  return function ()
+  return function()
     for i, val in fn, state, control do
       control = i
       local result = map(i, val)
@@ -155,10 +155,10 @@ end
 ---@param item Item
 function M.item_as_line(item)
   return
-    (' '):rep(item.position.col)
-    .. item.marker
-    .. ' '
-    .. item.body
+      (' '):rep(item.position.col)
+      .. item.marker
+      .. ' '
+      .. item.body
 end
 
 ---@param match fun(item: Item): boolean
@@ -173,18 +173,18 @@ end
 -- Links with 't' will still work after changing status.
 -- Sections can also be linked without specifying exact depth
 local link_marker_classes = {
-  ['t'] = '[>.,-=]',  -- [t]ask
-  ['p'] = '[*[]',     -- [p]roperty
-  ['s'] = '#+'        -- [s]ection
+  ['t'] = '[>.,-=]', -- [t]ask
+  ['p'] = '[*[]',    -- [p]roperty
+  ['s'] = '#+'       -- [s]ection
 }
 
 local function match_item_target(target, item)
   local marker_match_pattern = link_marker_classes[target.marker]
 
   local marker_matches =
-  marker_match_pattern ~= nil
-  and item.marker:match(marker_match_pattern)
-  or item.marker == target.marker
+      marker_match_pattern ~= nil
+      and item.marker:match(marker_match_pattern)
+      or item.marker == target.marker
 
   if not marker_matches then return false end
 
@@ -209,7 +209,7 @@ end
 ---@param pat string
 local function cannon_pattern(pat)
   return (pat:gsub('(%a)',
-    function (l)
+    function(l)
       return '[' .. l:upper() .. l:lower() .. ']'
     end
   ):gsub('%-', '%%-'))
@@ -348,7 +348,7 @@ function M.get_link_at_col(line, col)
 
         if commit == nil then
           file = {
-            path = file_part 
+            path = file_part
           }
         else
           file = {

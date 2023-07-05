@@ -2,7 +2,7 @@ local items = require('note.items')
 local util  = require('note.util')
 local files = require('note.files')
 
-local M = {}
+local M     = {}
 
 local function add_activity_timestamp(item, lines, child)
   local activity = items.find_child(function(x)
@@ -60,22 +60,22 @@ function M.mark_done(item, lines)
   if parent == nil then return end
 
   local parent_activity =
-    items.find_child(function(x)
-      return x.marker == '*' and x.body == 'activity' and items.relative_depth(parent, x) == 1
-    end, parent, lines)
+      items.find_child(function(x)
+        return x.marker == '*' and x.body == 'activity' and items.relative_depth(parent, x) == 1
+      end, parent, lines)
 
   if parent_activity == nil then return end
 
   local unfinished =
-    items.find_child(function(child)
-      return items.relative_depth(parent, child) == 1
-        and child.marker:match('[%-%=]')
-    end, parent, lines)
+      items.find_child(function(child)
+        return items.relative_depth(parent, child) == 1
+            and child.marker:match('[%-%=]')
+      end, parent, lines)
 
   if unfinished == nil or unfinished.position.row == item.position.row then
     -- all depth 1 are finished
     M.mark_done(parent, lines)
-      -- marks recursively, could loop forever if parent somehow loops
+    -- marks recursively, could loop forever if parent somehow loops
   end
 end
 

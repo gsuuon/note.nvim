@@ -48,7 +48,7 @@ local chars = {
 local function create_ref_id(length)
   local res = ''
 
-  for _=1,length,1 do
+  for _ = 1, length, 1 do
     local idx = math.random(1, 36)
     res = res .. chars[idx]
   end
@@ -183,7 +183,7 @@ function M.paste_item(item, current_file, root)
 
   local pasted_ref = M.create_ref_info_item(added_item, current_file)
 
-  vim.cmd.split(files.join_paths({root, M.saved_item.file}))
+  vim.cmd.split(files.join_paths({ root, M.saved_item.file }))
 
   local target = {
     marker = '*',

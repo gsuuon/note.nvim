@@ -36,7 +36,7 @@ function M.cursor_set(pos, jump)
 
     vim.fn.feedkeys(row_keys .. col_keys, 'n')
   else
-    vim.api.nvim_win_set_cursor(0, {pos.row + 1, pos.col})
+    vim.api.nvim_win_set_cursor(0, { pos.row + 1, pos.col })
   end
 end
 
@@ -49,7 +49,7 @@ function M.tbl_slice(tbl, start, stop, reverse)
     start = start + 1
   end
 
-  for x=start, stop, step do
+  for x = start, stop, step do
     table.insert(res, tbl[x])
   end
 

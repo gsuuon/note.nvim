@@ -9,7 +9,7 @@ end
 
 --- Checks if a directory exists
 function M.dir_exists(path)
-    return vim.fn.isdirectory(path) ~= 0
+  return vim.fn.isdirectory(path) ~= 0
 end
 
 ---@param paths string[]
@@ -80,7 +80,7 @@ end
 ---@return string | nil
 local function sibling(type, path, forward)
   local parent = M.parent(path)
-  local siblings = M.list(parent, {type = type})
+  local siblings = M.list(parent, { type = type })
 
   local exists
   if type == 'directory' then
@@ -122,7 +122,7 @@ end
 
 function M.commit_lines(commit, filepath, root)
   local proc = vim.system(
-    {'git', 'show', commit .. ':' .. filepath},
+    { 'git', 'show', commit .. ':' .. filepath },
     {
       text = true,
       cwd = root
@@ -201,7 +201,7 @@ function M.find_containing_directory(directory, directories)
   local function sort_longest(xs)
     local items = util.tbl_slice(xs, 0, #xs)
 
-    table.sort(items, function(a,b)
+    table.sort(items, function(a, b)
       return #a > #b
     end)
 
@@ -209,7 +209,7 @@ function M.find_containing_directory(directory, directories)
   end
 
   return util.find_value(
-    function (path)
+    function(path)
       return util.starts_with(directory, vim.fs.normalize(path))
     end,
     sort_longest(directories)
@@ -218,7 +218,7 @@ end
 
 function M.current_commit(root)
   local proc = vim.system(
-    {'git', 'rev-parse', '--short=10', 'HEAD' },
+    { 'git', 'rev-parse', '--short=10', 'HEAD' },
     {
       text = true,
       cwd = root

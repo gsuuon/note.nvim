@@ -80,7 +80,7 @@ local function follow_link_at_cursor()
     local filepath = link_filepath(link)
 
     if link.file.commit then
-      filepath = path_relative_to_root(filepath):gsub('^/','')
+      filepath = path_relative_to_root(filepath):gsub('^/', '')
 
       local lines = files.commit_lines(
         link.file.commit,
@@ -209,15 +209,15 @@ local function insert_timestamp(marker, pre_indent_child)
   local pos = util.cursor()
 
   vim.api.nvim_put(lines, "l", true, false)
-    -- nvim_put's follow behavior seems to be pretty complicated
-    -- manually setting the position is the only way to be consistent
+  -- nvim_put's follow behavior seems to be pretty complicated
+  -- manually setting the position is the only way to be consistent
 
   util.cursor_set({
     col = pos.col,
     row = pos.row + 2
   })
 
-  vim.cmd.startinsert({bang = true})
+  vim.cmd.startinsert({ bang = true })
 end
 
 local function is_day_note(path)
@@ -297,7 +297,7 @@ function M.create_global_commands()
   --- Gets the space based on current file, then cwd, else first item in config.spaces
 
   local function open_note_index()
-    vim.cmd('e ' .. files.join_paths({current_note_root(), 'index'}))
+    vim.cmd('e ' .. files.join_paths({ current_note_root(), 'index' }))
   end
 
   local function open(args)
@@ -353,7 +353,7 @@ function M.create_global_commands()
     'Note',
     open,
     {
-      nargs='*',
+      nargs = '*',
       complete = complete_open,
     }
   )
@@ -389,7 +389,7 @@ function M.create_buffer_commands()
     0,
     'NoteFindItem',
     goto_find_item,
-    {nargs='+'}
+    { nargs = '+' }
   )
 
   vim.api.nvim_buf_create_user_command(
@@ -397,7 +397,7 @@ function M.create_buffer_commands()
     'NoteMarkItem',
     function(args)
       if args.range == 2 then
-        for row=args.line1,args.line2 do
+        for row = args.line1, args.line2 do
           mark_item(args.fargs[1], row - 1)
         end
       else
@@ -405,8 +405,8 @@ function M.create_buffer_commands()
       end
     end,
     {
-      nargs=1,
-      range=true
+      nargs = 1,
+      range = true
     }
   )
 
@@ -416,7 +416,7 @@ function M.create_buffer_commands()
     function(args)
       mark_item_children(args.fargs[1])
     end,
-    {nargs=1}
+    { nargs = 1 }
   )
 
   vim.api.nvim_buf_create_user_command(
@@ -431,7 +431,7 @@ function M.create_buffer_commands()
     'NoteAddChild',
     add_child,
     {
-      nargs='+',
+      nargs = '+',
     }
   )
 
@@ -476,13 +476,13 @@ function M.create_buffer_commands()
       for _, section in ipairs(data.sections) do
         table.insert(
           sections,
-          table.concat(section.scope or {'<top>'}, '/')
-            .. ': ' .. #section.items .. ' item(s)'
+          table.concat(section.scope or { '<top>' }, '/')
+          .. ': ' .. #section.items .. ' item(s)'
         )
       end
 
-      vim.notify(table.concat(tasks, '\n'), nil, {title = 'tasks'})
-      vim.notify(table.concat(sections, '\n'), nil, {title = 'sections'})
+      vim.notify(table.concat(tasks, '\n'), nil, { title = 'tasks' })
+      vim.notify(table.concat(sections, '\n'), nil, { title = 'sections' })
     end,
     {}
   )
@@ -549,7 +549,7 @@ function M.create_buffer_commands()
     0,
     'NoteItemLinkToday',
     link_item_today,
-    {nargs='+'}
+    { nargs = '+' }
   )
 
   vim.api.nvim_buf_create_user_command(
@@ -595,7 +595,7 @@ function M.create_buffer_commands()
         link.col,
         pos.row,
         link.col_stop,
-        {link_str}
+        { link_str }
       )
     end,
     {}
@@ -607,10 +607,10 @@ function M.create_buffer_commands()
     function(args)
       insert_timestamp(args.fargs[1] or '*', true)
     end,
-    {nargs='?'}
+    { nargs = '?' }
   )
 
-  vim.api.nvim_create_autocmd({"BufWritePre"}, {
+  vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     buffer = 0,
     callback = make_intermediate_directories
   })
@@ -619,7 +619,7 @@ end
 function M.create_buffer_keymaps(prefix)
   local function bufkey(lhs, rhs, mode)
     mode = mode or 'n'
-    vim.keymap.set(mode, prefix .. lhs, rhs, {buffer = true})
+    vim.keymap.set(mode, prefix .. lhs, rhs, { buffer = true })
   end
 
   if is_day_note(vim.fn.bufname()) then
@@ -635,7 +635,7 @@ function M.create_buffer_keymaps(prefix)
 
   local function dot_repeatable(fn)
     -- https://gist.github.com/kylechui/a5c1258cd2d86755f97b10fc921315c3
-    return function ()
+    return function()
       _G.note_last_op = fn
       vim.o.operatorfunc = 'v:lua.note_last_op'
       return 'g@l'
@@ -675,7 +675,7 @@ function M.create_buffer_keymaps(prefix)
       'n',
       prefix .. 'f' .. marker,
       dot_repeatable(function()
-        local item = find_item({marker = marker, body = '.'})
+        local item = find_item({ marker = marker, body = '.' })
         if item == nil then return end
 
         util.cursor_set(item.position, true)

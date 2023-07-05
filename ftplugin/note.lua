@@ -20,4 +20,3 @@ if not vim.b.did_note_plugin then
 
   vim.b.did_note_plugin = true
 end
-
