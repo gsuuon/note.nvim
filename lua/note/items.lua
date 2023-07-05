@@ -65,7 +65,7 @@ local function iter_map(map, packed_iterator, stop_at_nil)
   if type(packed_iterator) == 'function' then
     fn = packed_iterator
   else
-    fn, state, last = table.unpack(packed_iterator)
+    fn, state, last = util.tbl_unpack(packed_iterator)
   end
   local control = last
 
@@ -80,7 +80,7 @@ local function iter_map(map, packed_iterator, stop_at_nil)
   end
 end
 
----Iterates items over a packed iterator (e.g. table.pack(ipairs(lines)))
+---Iterates items over a packed iterator (e.g. util.tbl_pack(ipairs(lines)))
 ---iterator's first return value should be 1-indexed row
 ---@param packed_iterator any
 ---@return fun(): Item iterator
@@ -93,7 +93,7 @@ end
 ---Iterate over items in lines
 ---@return fun(): Item
 function M.items(lines)
-  return items_from_iter(table.pack(ipairs(lines)))
+  return items_from_iter(util.tbl_pack(ipairs(lines)))
 end
 
 ---Iterate over children of an item
@@ -230,7 +230,7 @@ function M.scan_for_item(target, row, lines, is_pattern)
   -- Scan down from row
   local item = find_item_matching_iter(
     target,
-    table.pack(
+    util.tbl_pack(
       util.tbl_iter(lines, row + 1, #lines)
     )
   )
@@ -240,7 +240,7 @@ function M.scan_for_item(target, row, lines, is_pattern)
   -- Scan up from row
   item = find_item_matching_iter(
     target,
-    table.pack(
+    util.tbl_pack(
       util.tbl_iter(lines, row, 0)
     )
   )

@@ -1,5 +1,11 @@
 local M = {}
 
+-- :(
+M.tbl_unpack = table.unpack or unpack
+M.tbl_pack = table.pack or function(...)
+  return { n = select("#", ...), ... }
+end
+
 function M.find_value(match, map)
   for i, v in ipairs(map) do
     if match(v) then
@@ -87,7 +93,7 @@ function M.tbl_iter(tbl, start, stop)
 end
 
 function M.iter(xs)
-  return table.pack(ipairs(xs))
+  return M.tbl_pack(ipairs(xs))
 end
 
 function M.timestamp()

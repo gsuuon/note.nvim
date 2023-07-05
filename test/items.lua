@@ -1,4 +1,5 @@
 local items = require('note.items')
+local util = require('note.util')
 
 local test_lines = {
   'word',
@@ -138,7 +139,7 @@ local function test_children()
   local first_b = items.find_item_matching_iter({
     marker = '-',
     body = '.'
-  }, table.pack(ipairs(lines)))
+  }, util.tbl_pack(ipairs(lines)))
 
 
   local children = collect(items.children(first_b, lines))
