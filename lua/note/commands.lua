@@ -589,6 +589,10 @@ function M.create_buffer_commands()
         update_link_file = {
           path = path_relative_to_root(files.current_file()),
         }
+      else
+        update_link_file = {
+          path = link.file.path
+        }
       end
 
       local current_commit, err = files.current_commit(current_note_root())
