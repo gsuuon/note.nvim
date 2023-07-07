@@ -3,29 +3,29 @@ local files = require('note.files')
 
 local M = {}
 
----@class Position
----@field row number 0-indexed row
----@field col number 0-indexed column
+--- @class Position
+--- @field row number 0-indexed row
+--- @field col number 0-indexed column
 
----@class Item
----@field body string content of the item
----@field marker string marker character
----@field position Position start position of the item marker
+--- @class Item
+--- @field body string content of the item
+--- @field marker string marker character
+--- @field position Position start position of the item marker
 
----@class Target
----@field body string pattern to search for
----@field marker string marker character or marker class
+--- @class Target
+--- @field body string pattern to search for
+--- @field marker string marker character or marker class
 
----@class Link:Target
----@field col number
----@field col_stop number
----@field file? { path: string, commit?: string }
----@field action? string
+--- @class Link:Target
+--- @field start number
+--- @field stop number
+--- @field file? { path: string, commit?: string }
+--- @field action? string
 
 --- Try to parse a line as an item
----@param line string
----@param row number
----@return Item | nil
+--- @param line string
+--- @param row number
+--- @return Item | nil
 function M.parse_item(line, row)
   local indents, marker, body = line:match('^(%s*)([^%s]) (.+)')
 
@@ -55,10 +55,10 @@ function M.parse_item(line, row)
   end
 end
 
----Maps over an iterator
----@param map fun(control, value): any map
----@param packed_iterator any iterator, can be packed table of an iterator
----@param stop_at_nil? boolean stop mapping if map returns nil
+--- Maps over an iterator
+--- @param map fun(control, value): any map
+--- @param packed_iterator any iterator, can be packed table of an iterator
+--- @param stop_at_nil? boolean stop mapping if map returns nil
 local function iter_map(map, packed_iterator, stop_at_nil)
   local fn, state, last
 
@@ -80,25 +80,25 @@ local function iter_map(map, packed_iterator, stop_at_nil)
   end
 end
 
----Iterates items over a packed iterator (e.g. util.tbl_pack(ipairs(lines)))
----iterator's first return value should be 1-indexed row
----@param packed_iterator any
----@return fun(): Item iterator
+--- Iterates items over a packed iterator (e.g. util.tbl_pack(ipairs(lines)))
+--- iterator's first return value should be 1-indexed row
+--- @param packed_iterator any
+--- @return fun(): Item iterator
 local function items_from_iter(packed_iterator)
   return iter_map(function(row1, line)
     return M.parse_item(line, row1 - 1)
   end, packed_iterator)
 end
 
----Iterate over items in lines
----@return fun(): Item
+--- Iterate over items in lines
+--- @return fun(): Item
 function M.items(lines)
   return items_from_iter(util.tbl_pack(ipairs(lines)))
 end
 
----Iterate over children of an item
----@param parent_item Item parent item
----@param lines string[] all lines of file
+--- Iterate over children of an item
+--- @param parent_item Item parent item
+--- @param lines string[] all lines of file
 function M.children(parent_item, lines)
   local start_row = parent_item.position.row + 1
 
@@ -115,7 +115,7 @@ function M.children(parent_item, lines)
   )
 end
 
----@return Item | nil
+--- @return Item | nil
 function M.parent(item, lines)
   for row1, line in util.tbl_iter(lines, item.position.row, 0) do
     local x = M.parse_item(line, row1 - 1)
@@ -125,7 +125,7 @@ function M.parent(item, lines)
   end
 end
 
----@return Item | nil
+--- @return Item | nil
 function M.get_last_child(parent, lines)
   local last
   for x in M.children(parent, lines) do
@@ -134,7 +134,7 @@ function M.get_last_child(parent, lines)
   return last
 end
 
----@return Item | nil
+--- @return Item | nil
 function M.find_child(match, parent, lines)
   for child in M.children(parent, lines) do
     if match(child) then
@@ -143,16 +143,16 @@ function M.find_child(match, parent, lines)
   end
 end
 
----@param a Item
----@param b Item
----@return number Relative depth of b to a (based on vim.o.sw) - can be float
+--- @param a Item
+--- @param b Item
+--- @return number Relative depth of b to a (based on vim.o.sw) - can be float
 function M.relative_depth(a, b)
   local diff = b.position.col - a.position.col
   local depth = diff / vim.o.sw
   return depth
 end
 
----@param item Item
+--- @param item Item
 function M.item_as_line(item)
   return
       (' '):rep(item.position.col)
@@ -161,8 +161,8 @@ function M.item_as_line(item)
       .. item.body
 end
 
----@param match fun(item: Item): boolean
----@param lines string[]
+--- @param match fun(item: Item): boolean
+--- @param lines string[]
 function M.find_item(match, lines)
   for item in M.items(lines) do
     if match(item) then return item end
@@ -205,8 +205,8 @@ function M.find_target(target, lines)
   end, lines)
 end
 
----Convert a pattern to a case insensitive pattern (a -> [Aa]) and escape dashes
----@param pat string
+--- Convert a pattern to a case insensitive pattern (a -> [Aa]) and escape dashes
+--- @param pat string
 local function cannon_pattern(pat)
   return (pat:gsub('(%a)',
     function(l)
@@ -216,10 +216,10 @@ local function cannon_pattern(pat)
 end
 
 --- Finds the item first scanning down from row, then up from row.
----@param target Target
----@param row number 0-indexed row
----@param lines string[]
----@param is_pattern? boolean body is a pattern, do not convert to case sensitive and escape dash
+--- @param target Target
+--- @param row number 0-indexed row
+--- @param lines string[]
+--- @param is_pattern? boolean body is a pattern, do not convert to case sensitive and escape dash
 function M.scan_for_item(target, row, lines, is_pattern)
   if not is_pattern then
     target = vim.tbl_extend('force', target, {
@@ -248,7 +248,7 @@ function M.scan_for_item(target, row, lines, is_pattern)
 end
 
 --- Gets the item under the cursor
----@return Item | nil
+--- @return Item | nil
 function M.cursor_item()
   local cursor = util.cursor()
 
@@ -258,9 +258,9 @@ function M.cursor_item()
   return M.parse_item(line, cursor.row)
 end
 
----@param parent Item
----@param child { marker: string, body: string }
----@return Item
+--- @param parent Item
+--- @param child { marker: string, body: string }
+--- @return Item
 function M.add_child(parent, child, bufnr)
   local is_section = parent.marker:sub(1, 1) == '#'
 
@@ -276,11 +276,11 @@ function M.add_child(parent, child, bufnr)
   return child_item
 end
 
----Add child to parent at end
----@param parent Item
----@param child { marker: string, body: string }
----@param lines string[]
----@return Item
+--- Add child to parent at end
+--- @param parent Item
+--- @param child { marker: string, body: string }
+--- @param lines string[]
+--- @return Item
 function M.add_last_child(parent, child, lines)
   local last = M.get_last_child(parent, lines)
   if last == nil then
@@ -297,15 +297,15 @@ function M.add_last_child(parent, child, lines)
   end
 end
 
----@param item Item
----@param update { marker: string, body: string }
+--- @param item Item
+--- @param update { marker: string, body: string }
 function M.set_item(item, update)
   local item_ = vim.tbl_extend('force', item, update)
   files.set_line(item_.position.row, M.item_as_line(item_))
   return item_
 end
 
----Inserts item at its position
+--- Inserts item at its position
 function M.add_item(item, bufnr)
   files.set_line(
     item.position.row,
@@ -397,9 +397,9 @@ local function string_match_at(line, pattern, col)
 end
 
 --- Finds links in line, returning the one that spans col
----@param line string
----@param col number 0-indexed col of line
----@return Link | nil
+--- @param line string
+--- @param col number 0-indexed col of line
+--- @return Link | nil
 function M.get_link_at_col(line, col)
   local matched = string_match_at(line, '%[(.-)%]', col)
 
@@ -413,7 +413,7 @@ function M.get_link_at_col(line, col)
   return link
 end
 
----@param link Link
+--- @param link Link
 function M.link_to_str(link)
   -- [(f@c)marker|body|action]
   local file_part
