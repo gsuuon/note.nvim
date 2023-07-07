@@ -79,7 +79,7 @@ local function follow_link_at_cursor()
   if link.file ~= nil then
     local filepath = link_filepath(link)
 
-    if link.file.commit then
+    if link.file.commit and link.file.commit ~= '' then
       filepath = path_relative_to_root(filepath):gsub('^/', '')
 
       local lines = files.commit_lines(

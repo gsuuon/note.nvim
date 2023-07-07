@@ -352,7 +352,7 @@ local function parse_link(str)
 
     res.file = {
       path = path,
-      commit = commit == '' and nil or commit
+      commit = commit
     }
 
     return res
