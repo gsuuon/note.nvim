@@ -66,14 +66,15 @@ function M.mark_done(item, lines)
 
   if parent_activity == nil then return end
 
-  local unfinished =
+  local unfinished_sibling = -- depth 1 children of parent
       items.find_child(function(child)
-        return items.relative_depth(parent, child) == 1
-            and child.marker:match('[%-%=]')
+        return
+            child.marker:match('[%-%=]')
+            and items.relative_depth(parent, child) == 1
+            and child.position.row ~= item.position.row
       end, parent, lines)
 
-  if unfinished == nil or unfinished.position.row == item.position.row then
-    -- all depth 1 are finished
+  if unfinished_sibling == nil then
     M.mark_done(parent, lines)
     -- marks recursively, could loop forever if parent somehow loops
   end
