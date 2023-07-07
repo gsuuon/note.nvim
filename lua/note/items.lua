@@ -328,53 +328,89 @@ function M.find_or_create_child(parent, child, lines)
   return M.add_child(parent, child)
 end
 
---- Finds links in line, returning the one that spans col
----@param line string
----@param col number 0-indexed col of line
----@return Link
-function M.get_link_at_col(line, col)
-  local start, stop = line:find('%[.-|.-%]')
+local function parse_item_part(str)
+  local marker, body, action = str:match('([^|]+)|?([^|]*)|?([^|]*)')
+
+  local res = { marker = marker }
+  if #body > 0 then
+    res.body = body
+  end
+
+  if #action > 0 then
+    res.action = action
+  end
+
+  return res
+end
+
+local function parse_link(str)
+  local file_part, item_part = str:match('^%((.+)%)(.+)')
+
+  if file_part == nil then
+    return parse_item_part(str)
+  else
+    local res = parse_item_part(item_part)
+
+    local path, commit = file_part:match('([^@]+)@?(.*)')
+    res.path = path
+
+    if #commit > 0 then
+      res.commit = commit
+    end
+
+    return res
+  end
+end
+
+--- @return { start: number, stop: number, matches: string[] } | nil
+local function string_match_at(line, pattern, col)
+  -- FIXME this function is pretty awful. multivals are painful.
+  local res = { line:find(pattern) }
+  local start, stop, group = table.unpack(res)
+
   local col1 = col + 1
 
   while start ~= nil do
     if col1 >= start and col1 <= stop then
-      local head, tail = line:sub(start, stop):match('%[(.-)|(.-)%]')
 
-      local _, file_stop, file_part = head:find('%((.+)%)')
-
-      local file
-      if file_part ~= nil then
-        local path, commit = file_part:match('(.+)@(.+)')
-
-        if commit == nil then
-          file = {
-            path = file_part
-          }
-        else
-          file = {
-            path = path,
-            commit = commit
-          }
-        end
+      local matches
+      if group == nil then -- no capture
+        matches = { (line:sub(start, stop)) }
+      else
+        matches = util.tbl_unpack(res, 3)
       end
 
-      local marker = head:match('.+', file_stop and file_stop + 1 or 1)
-
-      local body, action = tail:match('(.-)|(.-)$')
-      if body == nil then body = tail end
-
       return {
-        marker = marker,
-        body = body,
-        file = file,
-        col = start - 1,
-        col_stop = stop,
-        action = action,
+        start = start,
+        stop = stop,
+        matches = matches
       }
     end
 
-    start, stop = line:find('%[.-|.-%]', stop)
+    res = { line:find(pattern) }
+    start = res[1]
+    if start == nil then return end
+
+    stop = res[2]
+    group = res[3]
   end
+end
+
+--- Finds links in line, returning the one that spans col
+---@param line string
+---@param col number 0-indexed col of line
+---@return Link | nil
+function M.get_link_at_col(line, col)
+  local matched = string_match_at(line, '%[(.-)%]', col)
+
+  if matched == nil then return end
+
+  local link = parse_link(matched.matches[1])
+
+  link.col = matched.start - 1
+  link.col_stop = matched.stop
+
+  return link
 end
 
 ---@param link Link
