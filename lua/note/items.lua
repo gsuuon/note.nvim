@@ -349,11 +349,11 @@ local function parse_link(str)
     local res = parse_item_part(item_part) or {}
 
     local path, commit = file_part:match('([^@]+)@?(.*)')
-    res.path = path
 
-    if #commit > 0 then
-      res.commit = commit
-    end
+    res.file = {
+      path = path,
+      commit = commit == '' and nil or commit
+    }
 
     return res
   end
