@@ -616,9 +616,9 @@ function M.create_buffer_commands()
       vim.api.nvim_buf_set_text(
         0,
         pos.row,
-        link.col,
+        link.start,
         pos.row,
-        link.col_stop,
+        link.stop,
         { link_str }
       )
     end,

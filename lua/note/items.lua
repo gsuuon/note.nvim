@@ -329,27 +329,24 @@ function M.find_or_create_child(parent, child, lines)
 end
 
 local function parse_item_part(str)
-  local marker, body, action = str:match('([^|]+)|?([^|]*)|?([^|]*)')
+  local marker, body, action = str:match('^([^|]*)|?([^|]*)|?([^|]*)')
 
-  local res = { marker = marker }
-  if #body > 0 then
-    res.body = body
-  end
+  if marker == nil then return end
 
-  if #action > 0 then
-    res.action = action
-  end
-
-  return res
+  return {
+    marker = marker,
+    body = body,
+    action = action
+  }
 end
 
 local function parse_link(str)
-  local file_part, item_part = str:match('^%((.+)%)(.+)')
+  local file_part, item_part = str:match('^%((.+)%)(.*)')
 
   if file_part == nil then
     return parse_item_part(str)
   else
-    local res = parse_item_part(item_part)
+    local res = parse_item_part(item_part) or {}
 
     local path, commit = file_part:match('([^@]+)@?(.*)')
     res.path = path
@@ -375,14 +372,14 @@ local function string_match_at(line, pattern, col)
 
       local matches
       if group == nil then -- no capture
-        matches = { (line:sub(start, stop)) }
+        matches = { line:sub(start, stop) }
       else
-        matches = util.tbl_unpack(res, 3)
+        matches = { util.tbl_unpack(res, 3) }
       end
 
       return {
-        start = start,
-        stop = stop,
+        start = start - 1, -- 1 indexed
+        stop = stop, -- inclusive
         matches = matches
       }
     end
@@ -401,14 +398,15 @@ end
 --- @param col number 0-indexed col of line
 --- @return Link | nil
 function M.get_link_at_col(line, col)
+  -- TODO test
   local matched = string_match_at(line, '%[(.-)%]', col)
 
-  if matched == nil then return end
+  if matched == nil or matched.matches[1] == nil then return end
 
   local link = parse_link(matched.matches[1])
 
-  link.col = matched.start - 1
-  link.col_stop = matched.stop
+  link.start = matched.start
+  link.stop = matched.stop
 
   return link
 end
