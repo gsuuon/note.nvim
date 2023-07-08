@@ -363,7 +363,7 @@ end
 local function string_match_at(line, pattern, col)
   -- FIXME this function is pretty awful. multivals are painful.
   local res = { line:find(pattern) }
-  local start, stop, group = table.unpack(res)
+  local start, stop, group = util.tbl_unpack(res)
 
   local col1 = col + 1
 
