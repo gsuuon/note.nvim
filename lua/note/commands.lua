@@ -320,29 +320,33 @@ function M.create_global_commands()
     -- TODO use cur / col in case we arrow back to a previous path
     local arg_paths = vim.fn.split(line, ' ')
 
+    local function list_files(paths)
+      return vim.tbl_map(
+        function(x)
+          return x:gsub(' ', '\\ ')
+        end,
+        files.list(
+          files.join_paths(paths),
+          {
+            no_join = true,
+            no_hidden = true
+          }
+        )
+      )
+    end
+
     if cur == '' then
       -- last path is complete
       local paths = util.tbl_slice(arg_paths, 1, #arg_paths)
       table.insert(paths, 1, current_note_root())
-      return files.list(
-        files.join_paths(paths),
-        {
-          no_join = true,
-          no_hidden = true
-        }
-      )
+      return list_files(paths)
     end
 
     -- last path is being typed
     local paths = util.tbl_slice(arg_paths, 1, #arg_paths - 1)
     table.insert(paths, 1, current_note_root())
-    local head_files = files.list(
-      files.join_paths(paths),
-      {
-        no_join = true,
-        no_hidden = true
-      }
-    )
+
+    local head_files = list_files(paths)
 
     if cur == '' then return head_files end
 
