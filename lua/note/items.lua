@@ -384,7 +384,7 @@ local function string_match_at(line, pattern, col)
       }
     end
 
-    res = { line:find(pattern) }
+    res = { line:find(pattern, stop) }
     start = res[1]
     if start == nil then return end
 
