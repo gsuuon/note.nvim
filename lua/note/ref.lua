@@ -197,7 +197,7 @@ function M.paste_item(item, current_file, root)
     error('Saved ref not found: ' .. vim.inspect(M.saved_item))
   end
 
-  local original_item = items.parent(ref_item, lines)
+  local original_item = items.parent(items.parent(ref_item, lines), lines) -- first parent is "* links"
   if original_item == nil then return end
 
   local original_item_links = items.find_or_create_child(
