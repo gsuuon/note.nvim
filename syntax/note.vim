@@ -36,6 +36,9 @@ syn match noteSectionTitleText2 /^##\( \)\zs.\+/ containedin=noteSectionTitleLin
 syn match noteSectionTitleText3 /^###\( \)\zs.\+/ containedin=noteSectionTitleLine contained
 syn match noteSectionTitleTextMore /^####\+\( \)\zs.\+/ containedin=noteSectionTitleLine contained
 
+syn match noteLink /\[(.\+).*\]/
+syn match noteLink /\[.\+|.\+]/
+
 " hi noteItemMarker guibg=#cccccc
 
 hi link noteItemMarkerPending Identifier
@@ -57,6 +60,7 @@ hi link noteSymbolQuestion BlueSign
 hi link noteSymbolFlow AquaSign
 hi link noteSymbolSelect GreenSign
 
+hi link noteLink PmenuThumb
 
 hi link noteSectionTitleLine Comment
 if hlexists('TSDanger')
