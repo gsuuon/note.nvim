@@ -36,8 +36,8 @@ syn match noteSectionTitleText2 /^##\( \)\zs.\+/ containedin=noteSectionTitleLin
 syn match noteSectionTitleText3 /^###\( \)\zs.\+/ containedin=noteSectionTitleLine contained
 syn match noteSectionTitleTextMore /^####\+\( \)\zs.\+/ containedin=noteSectionTitleLine contained
 
-syn match noteLink /\[(.\+).*\]/
-syn match noteLink /\[.\+|.\+]/
+syn match noteLink /\[(.\+).*\]/ containedin=noteItemPending,noteItemCurrent,noteItemDone,noteItemCancelled,noteItemPaused,noteItemInfo,noteItemLabel
+syn match noteLink /\[.\+|.\+]/ containedin=noteItemPending,noteItemCurrent,noteItemDone,noteItemCancelled,noteItemPaused,noteItemInfo,noteItemLabel
 
 " hi noteItemMarker guibg=#cccccc
 
