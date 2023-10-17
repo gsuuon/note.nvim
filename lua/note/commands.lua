@@ -396,8 +396,15 @@ function M.create_buffer_commands()
     {
       nargs = '+',
       complete = function(cur_arg, arg_line)
-        local marker = arg_line:match('^NoteFindItem (.)')
-        if marker ~= 's' then return end
+        if arg_line:find('^NoteFindItem $') then
+          return { 't', 'p', 's', '-', '.', ',', '=', '[', '*' }
+        end
+
+        local marker = arg_line:match('^NoteFindItem (.) ')
+        if marker ~= 's' then
+          -- TODO use report to autocomplete any item type
+          return
+        end
 
         local lines = files.current_lines()
 
