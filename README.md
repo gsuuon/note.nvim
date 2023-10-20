@@ -109,7 +109,7 @@ require('note').setup({
 ### Note buffers
 `NoteCurrentItem` — Jump to the current task (`>`)  
 `NoteFindItem <marker> <body pattern>` — Jump to a matching item. Tab completes if marker is `s` with available sections in file  
-`NoteMarkItem <marker>` — Change the marker of the item under cursor. Only for task or property markers  
+`NoteMarkItem <marker>` — Change the marker of the item under cursor. Only for task or property markers. Dot-repeatable.  
 `NoteMarkItemChildren <marker>` — The cursor item and all children with a matching marker get marked  
 `NoteGoLink` — Follow the link under cursor  
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
