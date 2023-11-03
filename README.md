@@ -87,17 +87,26 @@ use 'gsuuon/note.nvim'
 ```
 
 ## Configuration
+With lazy.nvim:
 ```lua
--- These are the defaults
-require('note').setup({
-  spaces = { -- Spaces are note roots. These should have a `/notes` folder.
-    '~',
-    -- '~/code/myproject'
-  },
-  keymap = { -- set this to false to disable keymapping
-    prefix = '<leader>n'
+  {
+    'gsuuon/note.nvim',
+    opts = {
+      -- Spaces are note roots. These directories should contain a `./notes` directory (will be made if not).
+      -- Defaults to { '~' }.
+      spaces = {
+        '~',
+        -- '~/projects/foo'
+      },
+
+      -- Set keymap = false to disable keymapping
+      -- keymap = { 
+      --   prefix = '<leader>n'
+      -- }
+    },
+    cmd = 'Note',
+    ft = 'note'
   }
-})
 ```
 
 ## Commands
