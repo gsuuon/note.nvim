@@ -106,7 +106,7 @@ local function follow_link_at_cursor()
 
   -- TODO if ref can make case sensitive and add case sensitive refs
   local item = items.scan_for_item(
-    link,
+    link.link_target,
     (link.file == nil) and cursor.row or 0,
     lines,
     false
@@ -114,7 +114,7 @@ local function follow_link_at_cursor()
 
   if item == nil then return end
 
-  if link.action == 'parent' then
+  if link.link_target.action == 'parent' then
     item = items.parent(item, lines) or item
   end
 

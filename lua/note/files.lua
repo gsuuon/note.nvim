@@ -218,7 +218,7 @@ end
 
 function M.current_commit(root)
   local proc = vim.system(
-    { 'git', 'rev-parse', '--short=10', 'HEAD' },
+    { 'git', 'rev-parse', '--short=7', 'HEAD' },
     {
       text = true,
       cwd = root

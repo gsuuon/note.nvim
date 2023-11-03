@@ -16,11 +16,16 @@ local M = {}
 --- @field body string pattern to search for
 --- @field marker string marker character or marker class
 
---- @class Link:Target
+--- @alias LinkTarget
+--- | { marker: string }
+--- | { marker: string, body: string }
+--- | { marker: string, body: string, action: string }
+
+--- @class Link
 --- @field start number
 --- @field stop number
 --- @field file? { path: string, commit?: string }
---- @field action? string
+--- @field link_target? LinkTarget
 
 --- Try to parse a line as an item
 --- @param line string
@@ -328,7 +333,7 @@ function M.find_or_create_child(parent, child, lines)
   return M.add_child(parent, child)
 end
 
-local function parse_item_part(str)
+local function parse_link_target(str)
   local marker, body, action = str:match('^([^|]*)|?([^|]*)|?([^|]*)')
 
   if marker == nil then return end
@@ -340,22 +345,25 @@ local function parse_item_part(str)
   }
 end
 
+---@param str string link string
+---@return Link
 local function parse_link(str)
-  local file_part, item_part = str:match('^%((.+)%)(.*)')
+  local file_part, target_part = str:match('^%((.+)%)(.*)')
 
   if file_part == nil then
-    return parse_item_part(str)
+    return {
+      link_target = parse_link_target(str)
+    }
   else
-    local res = parse_item_part(item_part) or {}
-
     local path, commit = file_part:match('([^@]+)@?(.*)')
 
-    res.file = {
-      path = path,
-      commit = commit
+    return {
+      file = {
+        path = path,
+        commit = commit
+      },
+      link_target = parse_link_target(target_part)
     }
-
-    return res
   end
 end
 
@@ -411,35 +419,38 @@ function M.get_link_at_col(line, col)
   return link
 end
 
---- @param link Link
+--- Returns a Link as [(file@commit)marker|body|action]
+---@param link Link
+---@return string 
 function M.link_to_str(link)
-  -- [(f@c)marker|body|action]
-  local file_part
-  if link.file.path == nil then
-    file_part = ''
-  else
-    if link.file.commit == nil then
-      file_part = link.file.path
-    else
-      file_part = link.file.path .. '@' .. link.file.commit
+
+  local file_part = ''
+
+  if link.file ~= nil then
+    file_part = file_part .. '(' .. link.file.path
+
+    if link.file.commit ~= nil then
+      file_part = file_part .. '@' .. link.file.commit
     end
 
-    file_part = '(' .. file_part .. ')'
+    file_part = file_part .. ')'
   end
 
-  local action_part
-  if link.action == nil then
-    action_part = ''
-  else
-    action_part = '|' .. link.action
-  end
-
-  return ('[%s%s|%s%s]'):format(
-    file_part,
-    link.marker,
-    link.body,
-    action_part
+  local link_part = table.concat(
+    vim.tbl_filter(
+      function(x)
+        return x ~= nil and x ~= ''
+      end,
+      {
+        link.link_target.marker,
+        link.link_target.body,
+        link.link_target.action,
+      }
+    ),
+    '|'
   )
+
+  return '[' .. file_part .. link_part .. ']'
 end
 
 return M
