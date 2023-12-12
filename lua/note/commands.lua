@@ -429,7 +429,7 @@ function M.create_buffer_commands()
     function(args)
       if args.range == 2 then
         for row = args.line1, args.line2 do
-          mark_item(args.fargs[1], row - 1)
+          mark_item(args.fargs[1], row)
         end
       else
         mark_item(args.fargs[1])
