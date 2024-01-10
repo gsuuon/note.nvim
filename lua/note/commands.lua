@@ -720,6 +720,9 @@ function M.create_buffer_keymaps(prefix)
   end
 end
 
+M.current_space = current_space
+M.current_note_root = current_note_root
+
 -- show(vim.fn.matchfuzzy({'Foo','Bar'}, 'f'))
 
 return M
