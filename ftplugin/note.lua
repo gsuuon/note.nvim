@@ -29,7 +29,7 @@ if not vim.b.did_note_plugin then
   vim.api.nvim_set_hl(0, '@note.paused.marker', { link = "WarningMsg", default = true })
   vim.api.nvim_set_hl(0, '@note.cancelled.marker', { link = "Error", default = true })
   vim.api.nvim_set_hl(0, '@note.done.marker', { link = "Constant", default = true })
-  vim.api.nvim_set_hl(0, '@note.current.marker', { link = "ModeMsg", default = true })
+  vim.api.nvim_set_hl(0, '@note.current.marker', { link = "QuickFixLine", default = true })
   vim.api.nvim_set_hl(0, '@note.label.marker', { link = "Tag", default = true })
   vim.api.nvim_set_hl(0, '@note.info.marker', { link = "Comment", default = true })
 
