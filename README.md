@@ -7,6 +7,9 @@ https://github.com/gsuuon/note.nvim/assets/6422188/4f186db5-7938-4c45-b791-c1c8f
 ## Motivation
 note.nvim makes it easy to take working notes and track tasks. It adds commands to help manipulate task items, create daily notes, and navigate within (and between) notes.
 
+## Tree-sitter
+A [tree-sitter grammar](https://github.com/gsuuon/tree-sitter-note) can be installed with `:TSInstall note`, which makes it possible to use treesitter based navigation like [tshjkl](https://github.com/gsuuon/tshjkl.nvim) with note items.
+
 ## Usage
 Write indent-scoped ideas / tasks / notes. You can set a template for daily notes (`:Note`) by creating `[note_root]/.note/daily_template`. You can also add spaces (`config.spaces = { '~', '~/myproject' }`) to set up different note root directories.
 

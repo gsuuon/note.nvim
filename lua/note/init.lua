@@ -14,7 +14,7 @@ local function setup_treesitter_info()
   local parser_config = require('nvim-treesitter.parsers').get_parser_configs()
   parser_config.note = {
     install_info = {
-      url = '~/code/gsuuon/tree-sitter-note',
+      url = 'https://github.com/gsuuon/tree-sitter-note',
       files = { 'src/parser.c', 'src/scanner.c' },
       branch = 'main',
       generate_requires_npm = false,
