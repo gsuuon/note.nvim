@@ -92,8 +92,8 @@ local function follow_link_at_cursor()
       local bufname = filepath .. '@' .. link.file.commit
       local bufnr = vim.fn.bufnr(bufname, true)
 
-      vim.api.nvim_buf_set_option(bufnr, 'buftype', 'nofile')
-      vim.api.nvim_buf_set_option(bufnr, 'filetype', 'note')
+      vim.api.nvim_buf_set_option_value('buftype', 'nofile', { buf = bufnr })
+      vim.api.nvim_buf_set_option_value('filetype', 'note', { buf = bufnr })
       vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
 
       vim.cmd.b(bufnr)
