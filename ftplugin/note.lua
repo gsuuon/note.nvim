@@ -38,5 +38,14 @@ if not vim.b.did_note_plugin then
   vim.api.nvim_set_hl(0, '@markup.heading.3.note', { link = "@markup.heading.3.markdown", default = true })
   vim.api.nvim_set_hl(0, '@markup.heading.4.note', { link = "@markup.heading.4.markdown", default = true })
 
+  local ok, parsers = pcall(require, "nvim-treesitter.parsers")
+  if ok then
+    if parsers.has_parser() then
+      vim.opt_local.foldmethod = 'expr'
+    else
+      vim.opt_local.foldmethod = 'indent'
+    end
+  end
+
   vim.b.did_note_plugin = true
 end
