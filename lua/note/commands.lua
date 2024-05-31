@@ -323,7 +323,7 @@ function M.create_global_commands()
     local function list_files(paths)
       return vim.tbl_map(
         function(x)
-          return x:gsub(' ', '\\ ')
+          return x:gsub(' ', '\\ ') -- Escape the space
         end,
         files.list(
           files.join_paths(paths),
