@@ -14,7 +14,7 @@ end
 
 ---@param paths string[]
 function M.join_paths(paths)
-  return vim.fs.normalize(vim.fn.simplify(table.concat(paths, '\\')))
+  return vim.fs.normalize(vim.fn.simplify(table.concat(paths, '/')))
 end
 
 ---@class ListOptions
