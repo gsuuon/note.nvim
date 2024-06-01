@@ -1,6 +1,7 @@
 local note = require('note')
 local util = require('note.util')
 local files = require('note.files')
+local dates = require('note.dates')
 local items = require('note.items')
 local activity = require('note.activity')
 local report = require('note.report')
@@ -133,7 +134,7 @@ local function goto_current_item()
 end
 
 local function goto_note(forward)
-  local file = files.sibling_across_dirs(files.current_file(), forward)
+  local file = dates.traverse(files.current_file(), forward)
 
   if file ~= nil then
     vim.cmd.edit(file)
@@ -304,10 +305,10 @@ function M.create_global_commands()
     if #args.fargs > 0 then
       -- join fargs with note root
       local file = files.join_paths(
-        vim.tbl_flatten({
+        vim.iter({
           current_note_root(),
           args.fargs,
-        })
+        }):flatten():totable()
       )
 
       vim.cmd.edit(file)

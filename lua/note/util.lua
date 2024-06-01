@@ -14,6 +14,14 @@ function M.find_value(match, map)
   end
 end
 
+function M.index_of(value, xs)
+  for i, v in ipairs(xs) do
+    if v == value then
+      return i
+    end
+  end
+end
+
 ---@param str string
 ---@param start string
 ---@return boolean

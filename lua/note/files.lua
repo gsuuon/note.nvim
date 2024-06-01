@@ -18,7 +18,7 @@ function M.join_paths(paths)
 end
 
 ---@class ListOptions
----@field type? 'directory' | 'file'
+---@field type? 'directory' | 'file' nil for both
 ---@field no_join? boolean don't join the file path with directory
 ---@field no_hidden? boolean filter out paths starting with '.'
 
@@ -50,59 +50,12 @@ function M.list(directory, opts)
   return results
 end
 
+
+
 function M.parent(dir)
   return vim.fs.normalize(vim.fn.fnamemodify(dir, ':h'))
 end
 
-local function next_item_in_list(xs, x)
-  local _, idx = util.find_value(function(y) return y == x end, xs)
-
-  if idx == nil then return end
-
-  if idx < #xs then
-    return xs[idx + 1]
-  end
-end
-
-local function previous_item_in_list(xs, x)
-  local _, idx = util.find_value(function(y) return y == x end, xs)
-
-  if idx == nil then return end
-
-  if idx > 1 then
-    return xs[idx - 1]
-  end
-end
-
----@param type 'file' | 'directory'
----@param path string
----@param forward boolean
----@return string | nil
-local function sibling(type, path, forward)
-  local parent = M.parent(path)
-  local siblings = M.list(parent, { type = type })
-
-  local exists
-  if type == 'directory' then
-    exists = M.dir_exists(path)
-  else
-    exists = M.exists(path)
-  end
-
-  if not exists then
-    if forward then
-      return siblings[1]
-    else
-      return siblings[#siblings]
-    end
-  end
-
-  if forward then
-    return next_item_in_list(siblings, path)
-  else
-    return previous_item_in_list(siblings, path)
-  end
-end
 
 function M.current_working_directory()
   return vim.fs.normalize(vim.fn.getcwd())
@@ -173,28 +126,6 @@ function M.set_line(row, line, bufnr, insert)
   )
 end
 
---- Gets the next sibling in same directory or next directory
-function M.sibling_across_dirs(file, forward)
-  local dir = M.parent(file)
-
-  local sibling_file_same_directory = sibling('file', file, forward)
-
-  if sibling_file_same_directory ~= nil then
-    return sibling_file_same_directory
-  end
-
-  local sibling_directory = sibling('directory', dir, forward)
-
-  if sibling_directory == nil then return end
-
-  local sibling_dir_files = M.list(sibling_directory, { type = 'file' })
-
-  if forward then
-    return sibling_dir_files[1]
-  else
-    return sibling_dir_files[#sibling_dir_files]
-  end
-end
 
 --- Find the longest item in directories which contains directory
 function M.find_containing_directory(directory, directories)
