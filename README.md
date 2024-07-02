@@ -19,7 +19,9 @@ With lazy.nvim:
   {
     'gsuuon/note.nvim',
     opts = {
-      -- opts.spaces are note workspace parent directories. These directories contain a `notes` directory (will be created if missing) which acts as the note root. So for the space '~' the note root will be `~/notes`.
+      -- opts.spaces are note workspace parent directories.
+      -- These directories contain a `notes` directory which will be created if missing.
+      -- `<space path>/notes` acts as the note root, so for space '~' the note root is `~/notes`.
       -- Defaults to { '~' }.
       spaces = {
         '~',
@@ -41,7 +43,7 @@ A [tree-sitter grammar](https://github.com/gsuuon/tree-sitter-note) can be insta
 
 https://github.com/gsuuon/note.nvim/assets/6422188/27fbbc66-6a6a-49ef-94ca-25e4e5eeb3b9
 
-> [!INFO]
+> [!NOTE]
 > The tree-sitter grammar currently assumes unix newlines, if tree-sitter parser is installed then note will :set ff=unix in note filetype buffers
 
 #### Highlights
@@ -98,7 +100,7 @@ const scratchFn = () => {}
 `#` — section -- Not indented - the number of #'s mean depth like markdown.  
 
 ### Decorators
-Decorators are special symbols to help with readability. They have [default highlight group](#highlights) links which can be overriden, or you can set `opts.disable_decorators = true` to disable decorator highlighting.
+Decorators are special symbols that help with readability. They have [default highlight group](#highlights) links which can be overriden, or you can set `opts.disable_decorators = true` to disable decorator highlighting.
 
 `  ->  ` — flow -- indicates one thing flowing to another  
 ` <-` — select -- indicates selecting one of a list  
@@ -124,8 +126,8 @@ You can create a link by writing `{{(<file>)<marker>|<content>}}`, where `<thing
 Link examples:
 
 `{{t|clean}}` - a task containing 'clean'  
-`{{(chores)s|daily}}` - a file in the same directory as the current file named 'chores' and finds the first section header containing 'daily'  
-`{{(/budget)t|groceries}}` - the 'budget' file in the note root and finds the first task containing 'groceries'  
+`{{(chores)s|daily}}` - a file in the same directory as the current file named 'chores', finds the first section header containing 'daily'  
+`{{(/budget)t|groceries}}` - the 'budget' file in the note root, finds the first task containing 'groceries'  
 `{{(/tasks)}}` - the 'tasks' file in the note root
 
 ## Examples
