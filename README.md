@@ -19,7 +19,9 @@ With lazy.nvim:
   {
     'gsuuon/note.nvim',
     opts = {
-      -- Spaces are note roots. These directories should contain a `./notes` directory (will be made if not).
+      -- opts.spaces are note workspace parent directories.
+      -- These directories contain a `notes` directory which will be created if missing.
+      -- `<space path>/notes` acts as the note root, so for space '~' the note root is `~/notes`.
       -- Defaults to { '~' }.
       spaces = {
         '~',
@@ -39,21 +41,24 @@ With lazy.nvim:
 ### Tree-sitter
 A [tree-sitter grammar](https://github.com/gsuuon/tree-sitter-note) can be installed with `:TSInstall note`. The grammar includes markdown style code-fenced injections of other languages and makes it possible to use treesitter based navigation like [tshjkl](https://github.com/gsuuon/tshjkl.nvim) with note items.
 
-
 https://github.com/gsuuon/note.nvim/assets/6422188/27fbbc66-6a6a-49ef-94ca-25e4e5eeb3b9
 
+> [!NOTE]
+> The tree-sitter grammar currently assumes unix newlines, if tree-sitter parser is installed then note will :set ff=unix in note filetype buffers
 
 #### Highlights
 The treesitter highlight groups are linked in [ftplugin/note.lua](ftplugin/note.lua) and the group queries are in [queries/note/highlights.scm](queries/note/highlights.scm). You can customize these by overriding the groups with your own links or highlights.
 
 ## Usage
-Open the daily note with `:Note`. This can be scoped to a workspace root with the `spaces` config option:
+Open the daily note with `:Note`. This can be scoped to a workspace root with the `spaces` config option.
 ```lua
 require('note').setup({
   spaces = { '~', '~/myproject' }
 })
 ```
-You can create a custom template for daily notes at `[note_root]/.note/daily_template`. note comes with [treesitter based highlighting](#tree-sitter) but falls back to a syntax file if the grammar is not installed.
+The active space will be the last path which contains the current working directory. Spaces are matched bottom up, so the least specific path should be first. The "note root" is `<space path>/notes/` - all note actions (daily notes, templating, rooted links) are done relative to this directory.
+
+You can create a custom template for daily notes at `<note root>/.note/daily_template`. note comes with [treesitter based highlighting](#tree-sitter) but falls back to a syntax file if the grammar is not installed.
 
 [Keymaps](#keymaps) are added for note.nvim commands with a default prefix of `<leader>n`.
 
@@ -67,7 +72,11 @@ Items can be properties or tasks. The first character is a marker that indicates
   . sub task
 ```
 
-Items are indent scoped - a newline and 2 spaces start a child item scope. They can contain any text content. Anything below an item which doesn't start a new scope becomes part of the text content of that item.
+Items are indentation scoped - a newline and 2 spaces deeper indent followed by a marker starts a child item scope. An item can contain any text on the same line, which becomes the item content. Items can also have a body (any text after the first line) as long as it doesn't start with a marker character or section header. Item bodies can contain code blocks with markdown style codefences.
+> [!IMPORTANT]
+> Each indent level is 2 spaces and each scope can only be one level deeper than the previous one.
+
+An item with a code block body:
 ````
 - a pending task
 ```js
@@ -90,31 +99,36 @@ const scratchFn = () => {}
 #### Sections
 `#` — section -- Not indented - the number of #'s mean depth like markdown.  
 
-### Modifiers
-Some special symbols will also highlight to help with readability:
+### Decorators
+Decorators are special symbols that help with readability. They have [default highlight group](#highlights) links which can be overriden, or you can set `opts.disable_decorators = true` to disable decorator highlighting.
 
-`->` — flow -- indicates one thing flowing to another  
-`<-` — select -- indicates selecting one of a list  
+`  ->  ` — flow -- indicates one thing flowing to another  
+` <-` — select -- indicates selecting one of a list  
 `(?)` — question -- draw attention to something confusing  
 `(!)` — warn -- draw attention to something important  
 
-### Links
-Links to items are created by simply writing text like `[(<file>)<marker>|<body>]`. Follow a link by putting the cursor over it and calling `:NoteGoLink`. This will search for a target item first by looking downwards from the link and then upwards. The file part can point to a specific commit.
 
-- `<body>` behaves like a case-insensitive `string.match` against items.
-- `(<file>)` if present links to that file relative to the current file - the path is joined with the current file's directory. If the file part starts with `/` then the path is resolved relative to the note root.
-- `(<file>@<commit>)` links to the file at a specific commit. The git root must be the same as the note workspace root.  
-- `<marker>` is a specific marker (e.g. `-`, `*`) or one of these special characters:
+### Links
+> [!WARNING]
+> **The link format has changed from `[<link>]` to `{{<link>}}`**. Use `:NoteConvertLinksSquareToCurly` in files with square bracket links to update them.
+
+You can create a link by writing `{{(<file>)<marker>|<content>}}`, where `<thing>` is a thing to be replaced (see below for examples). Follow a link by moving your cursor over it and running `:NoteGoLink`. This will search for a target item first by looking downwards from the link and then upwards. The file part can point to a specific commit.
+
+- `<content>` behaves like a case-insensitive `string.match` against item content.  
+- `(<file>)` links to `<file>` relative to the current file. The target path is joined with the current file's directory. If `<file>` starts with `/` then it will resolve relative to the note workspace root (e.g. `~/notes`). A link can just point to a file without specifying a marker or body.  
+- `(<file>@<commit>)` links to the file at a specific commit. The git root is assumed to be the same as the note workspace root.  
+- `<marker>` is a specific item marker (e.g. `-`, `*`) or one of these special characters:
 
 `s` — section -- matches any number of #'s  
 `p` — property -- matches any property marker  
 `t` — task -- matches any task marker  
 
-For example:
+Link examples:
 
-`[t|clean]` links to a task containing 'clean'  
-`[(chores)s|daily]` links to a file in the same directory as the current file named 'chores' and finds the first section with 'daily'  
-`[(/budget)t|groceries]` links to the 'budget' file in the note root and finds the first 'groceries' task  
+`{{t|clean}}` - a task containing 'clean'  
+`{{(chores)s|daily}}` - a file in the same directory as the current file named 'chores', finds the first section header containing 'daily'  
+`{{(/budget)t|groceries}}` - the 'budget' file in the note root, finds the first task containing 'groceries'  
+`{{(/tasks)}}` - the 'tasks' file in the note root
 
 ## Examples
 ![note](https://github.com/gsuuon/note.nvim/assets/6422188/813e74e7-d9dc-4b5f-b433-4ef294491797)
@@ -132,13 +146,13 @@ For example:
   > Pick up toys
 ```
 
-`[t|monday]` links to the `- Monday` task and `[(../health)s|goal]` links to the the 'health' file up one directory at a section matching `goal`.
+`{{t|monday}}` links to the `- Monday` task and `{{(../health)s|goal}}` links to the the 'health' file up one directory at a section matching `goal`.
 ```
-[t|monday]
+{{t|monday}}
 # Gym
 - Monday
   - Squats
-[(../health)s|goal]
+{{(../health)s|goal}}
 ```
 
 
@@ -156,7 +170,7 @@ For example:
 `NoteGoLink` — Follow the link under cursor  
 `NoteTime <marker?>` — Insert a timestamped item with marker (defaults to `*`)
 `NoteReport` — Notify with a summary of the current note  
-`NoteLinkPinCommit` — Modify the link under the cursor to pin it to the current commit (and absolute path of current file if not specified)  
+`NoteLinkPinCommit` — Modify the link under the cursor to pin it to the current commit and absolute path of current file (if not specified)  
 
 #### Refs
 `NoteRefCreate` — Create a ref for the item under the cursor  

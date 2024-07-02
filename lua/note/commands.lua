@@ -93,8 +93,8 @@ local function follow_link_at_cursor()
       local bufname = filepath .. '@' .. link.file.commit
       local bufnr = vim.fn.bufnr(bufname, true)
 
-      vim.api.nvim_buf_set_option_value('buftype', 'nofile', { buf = bufnr })
-      vim.api.nvim_buf_set_option_value('filetype', 'note', { buf = bufnr })
+      vim.api.nvim_set_option_value('buftype', 'nofile', { buf = bufnr })
+      vim.api.nvim_set_option_value('filetype', 'note', { buf = bufnr })
       vim.api.nvim_buf_set_lines(bufnr, 0, 0, false, lines)
 
       vim.cmd.b(bufnr)
@@ -646,10 +646,18 @@ function M.create_buffer_commands()
     { nargs = '?' }
   )
 
+  vim.api.nvim_buf_create_user_command(
+    0,
+    'NoteConvertLinksSquareToCurly',
+    util.convert_link_square_to_curly,
+    {}
+  )
+
   vim.api.nvim_create_autocmd({ "BufWritePre" }, {
     buffer = 0,
     callback = make_intermediate_directories
   })
+
 end
 
 function M.create_buffer_keymaps(prefix)
