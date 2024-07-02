@@ -3,7 +3,14 @@ vim.filetype.add({
     note = 'note',
   },
   pattern = {
-    ['.*/notes/.*'] = { 'note', { priority = -1 } }
+    ['(.*)/notes/.*'] = {
+      function(path, bufnr, prefix)
+        if not prefix:match('(.+)://') then -- ignore URI's
+          return 'note'
+        end
+      end,
+      { priority = -math.huge }
+    }
   }
 })
 
