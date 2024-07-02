@@ -108,4 +108,9 @@ function M.timestamp()
   return vim.fn.strftime('%I:%M.%S %p')
 end
 
+function M.convert_link_square_to_curly()
+  vim.cmd([[%s/\v\[(.{-}\|.{-})\]/\{\{\1}}/egc]])
+  vim.cmd([[%s/\v\[(\(.{-}\))\]/\{\{\1}}/egc]])
+end
+
 return M

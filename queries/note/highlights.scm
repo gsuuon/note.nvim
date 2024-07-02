@@ -31,26 +31,25 @@
 (section_header) @markup.heading.1
 
 (section
-  (section_children
-    (section
-      ((section_header) @markup.heading.2))))
+  (section
+    ((section_header) @markup.heading.2)))
 
 
 (section
-  (section_children
+  (section
     (section
-      (section_children
-        (section
-          ((section_header) @markup.heading.3))))))
+      ((section_header) @markup.heading.3))))
 
 
 (section
-  (section_children
+  (section
     (section
-      (section_children
-        (section
-          (section_children
-            (section
-              ((section_header) @markup.heading.4))))))))
+      (section
+        ((section_header) @markup.heading.4)))))
 
+(decorator_select) @note.decorator.select
+(decorator_flow) @note.decorator.flow
+(decorator_warn) @note.decorator.warn
+(decorator_question) @note.decorator.question
 
+(link) @note.link

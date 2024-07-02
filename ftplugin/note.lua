@@ -33,10 +33,20 @@ if not vim.b.did_note_plugin then
   vim.api.nvim_set_hl(0, '@note.label.marker', { link = "Tag", default = true })
   vim.api.nvim_set_hl(0, '@note.info.marker', { link = "Comment", default = true })
 
+  if note.config.disable_decorators == nil or note.config.disable_decorators == false then
+    vim.api.nvim_set_hl(0, '@note.decorator.select', { link = "GreenSign", default = true })
+    vim.api.nvim_set_hl(0, '@note.decorator.flow', { link = "AquaSign", default = true })
+    vim.api.nvim_set_hl(0, '@note.decorator.warn', { link = "YellowSign", default = true })
+    vim.api.nvim_set_hl(0, '@note.decorator.question', { link = "BlueSign", default = true })
+  end
+
+  vim.api.nvim_set_hl(0, '@note.link', { link = "NormalFloat", default = true })
+
   vim.api.nvim_set_hl(0, '@markup.heading.1.note', { link = "@markup.heading.1.markdown", default = true })
   vim.api.nvim_set_hl(0, '@markup.heading.2.note', { link = "@markup.heading.2.markdown", default = true })
   vim.api.nvim_set_hl(0, '@markup.heading.3.note', { link = "@markup.heading.3.markdown", default = true })
   vim.api.nvim_set_hl(0, '@markup.heading.4.note', { link = "@markup.heading.4.markdown", default = true })
+
 
   local ok, parsers = pcall(require, "nvim-treesitter.parsers")
   if ok then

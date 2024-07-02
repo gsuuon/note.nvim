@@ -407,7 +407,7 @@ end
 --- @return Link | nil
 function M.get_link_at_col(line, col)
   -- TODO test
-  local matched = string_match_at(line, '%[(.-)%]', col)
+  local matched = string_match_at(line, '%{{(.-)%}}', col)
 
   if matched == nil or matched.matches[1] == nil then return end
 
@@ -450,7 +450,7 @@ function M.link_to_str(link)
     '|'
   )
 
-  return '[' .. file_part .. link_part .. ']'
+  return '{{' .. file_part .. link_part .. '}}'
 end
 
 return M
