@@ -97,7 +97,7 @@ local function traverse_daily_notes(start_path, forward)
   end
 
   local delta = forward and 1 or -1
-  local skip_first = true
+  local skip_first = files.exists(start_path)
 
   for year in iter_date(start_year, {root}, 'directory', delta) do
     for month in iter_date(start_month, {root, year}, 'directory', delta) do
