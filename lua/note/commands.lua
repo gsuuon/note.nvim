@@ -205,7 +205,11 @@ end
 local function insert_timestamp(marker, pre_indent_child)
   local lines = { (marker or '*') .. ' ' .. util.timestamp() }
 
-  if pre_indent_child then table.insert(lines, '  ') end
+  if pre_indent_child then
+    table.insert(lines, '  ')
+  else
+    table.insert(lines, '')
+  end
 
   local pos = util.cursor()
 
@@ -641,7 +645,10 @@ function M.create_buffer_commands()
     0,
     'NoteTime',
     function(args)
-      insert_timestamp(args.fargs[1] or '*', true)
+      insert_timestamp(
+        args.fargs[1] or '*',
+        not (note.config.pre_indent_time == false) -- defaults to true
+      )
     end,
     { nargs = '?' }
   )
