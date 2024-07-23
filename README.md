@@ -44,7 +44,8 @@ A [tree-sitter grammar](https://github.com/gsuuon/tree-sitter-note) can be insta
 https://github.com/gsuuon/note.nvim/assets/6422188/27fbbc66-6a6a-49ef-94ca-25e4e5eeb3b9
 
 > [!NOTE]
-> The tree-sitter grammar currently assumes unix newlines, if tree-sitter parser is installed then note will :set ff=unix in note filetype buffers
+> The tree-sitter grammar currently assumes unix newlines, if tree-sitter parser is installed then note will :set ff=unix in note filetype buffers.
+> The grammar is also pretty inefficient on larger files in some conditions - it may be better to move larger sections to a markdown file and just link to them from the note.
 
 #### Highlights
 The treesitter highlight groups are linked in [ftplugin/note.lua](ftplugin/note.lua) and the group queries are in [queries/note/highlights.scm](queries/note/highlights.scm). You can customize these by overriding the groups with your own links or highlights.
@@ -61,6 +62,8 @@ The active space will be the last path which contains the current working direct
 You can create a custom template for daily notes at `<note root>/.note/daily_template`. note comes with [treesitter based highlighting](#tree-sitter) but falls back to a syntax file if the grammar is not installed.
 
 [Keymaps](#keymaps) are added for note.nvim commands with a default prefix of `<leader>n`.
+
+By default, files in `*/notes/.*` will get the note filetype via `vim.filetype.add` at the lowest priority but you can use the `.note` extension to make it explicit.
 
 ### Items
 Items can be properties or tasks. The first character is a marker that indicates the type and status of the item, some examples:
