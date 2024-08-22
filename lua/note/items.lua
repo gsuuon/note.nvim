@@ -212,7 +212,7 @@ end
 
 --- Convert a pattern to a case insensitive pattern (a -> [Aa]) and escape dashes
 --- @param pat string
-local function cannon_pattern(pat)
+local function canon_pattern(pat)
   return (pat:gsub('(%a)',
     function(l)
       return '[' .. l:upper() .. l:lower() .. ']'
@@ -225,10 +225,11 @@ end
 --- @param row number 0-indexed row
 --- @param lines string[]
 --- @param is_pattern? boolean body is a pattern, do not convert to case sensitive and escape dash
-function M.scan_for_item(target, row, lines, is_pattern)
+--- @param include_start? boolean scan can match against start row
+function M.scan_for_item(target, row, lines, is_pattern, include_start)
   if not is_pattern then
     target = vim.tbl_extend('force', target, {
-      body = cannon_pattern(target.body)
+      body = canon_pattern(target.body)
     })
   end
 
@@ -236,7 +237,7 @@ function M.scan_for_item(target, row, lines, is_pattern)
   local item = find_item_matching_iter(
     target,
     util.tbl_pack(
-      util.tbl_iter(lines, row + 1, #lines)
+      util.tbl_iter(lines, row + (include_start and 0 or 1), #lines)
     )
   )
   if item ~= nil then return item end

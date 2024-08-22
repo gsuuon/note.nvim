@@ -267,7 +267,9 @@ local function open_note_day()
 end
 
 local function link_item_today(args)
-  if args.fargs[1] == nil then return end
+  if args.fargs[1] == nil then 
+    vim.notify('Expected arguments: marker [body]', vim.log.levels.ERROR)
+  end
 
   local relative_path = path_relative_to_root(files.current_file())
 
@@ -284,7 +286,7 @@ local function link_item_today(args)
   }
 
   local lines = files.current_lines()
-  local target_item = items.scan_for_item(target, 0, lines, false)
+  local target_item = items.scan_for_item(target, 0, lines, false, true)
 
   if target_item == nil then
     -- TODO just copy to end of file
