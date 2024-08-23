@@ -115,12 +115,12 @@ end
 ---@return string | nil
 local function get_item_ref(item, lines)
   local ref_item = items.find_child(function(x)
-    return x.marker == '*' and x.body:match('ref:.+')
+    return x.marker == '*' and x.body:match('^ref:.+')
   end, item, lines)
 
   if ref_item == nil then return end
 
-  local ref = ref_item.body:match('ref:(.+)')
+  local ref = ref_item.body:match('^ref:(.+)')
   return ref
 end
 
@@ -186,13 +186,12 @@ function M.paste_item(item, current_file, root)
 
   vim.cmd.split(files.join_paths({ root, M.saved_item.file }))
 
-  local target = {
-    marker = '*',
-    body = 'ref:' .. M.saved_item.ref
-  }
-
   local lines = files.lines()
-  local ref_item = items.find_target(target, lines)
+
+  local ref_item = items.find_target({
+    marker = '*',
+    body = '^ref:' .. M.saved_item.ref
+  }, lines)
 
   if ref_item == nil then
     error('Saved ref not found: ' .. vim.inspect(M.saved_item))

@@ -267,7 +267,7 @@ local function open_note_day()
 end
 
 local function link_item_today(args)
-  if args.fargs[1] == nil then 
+  if args.fargs[1] == nil then
     vim.notify('Expected arguments: marker [body]', vim.log.levels.ERROR)
   end
 
