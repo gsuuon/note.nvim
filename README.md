@@ -61,7 +61,7 @@ The active space will be the last path which contains the current working direct
 
 You can create a custom template for daily notes at `<note root>/.note/daily_template`. note comes with [treesitter based highlighting](#tree-sitter) but falls back to a syntax file if the grammar is not installed.
 
-[Keymaps](#keymaps) are added for note.nvim commands with a default prefix of `<leader>n`.
+[Keymaps](#keymaps) for note.nvim commands are available in note buffers. The default prefix is `<leader>n`, this can be configured in options.
 
 By default, files in `*/notes/.*` will get the note filetype via `vim.filetype.add` at the lowest priority but you can use the `.note` extension to make it explicit.
 
