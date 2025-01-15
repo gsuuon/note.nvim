@@ -14,7 +14,7 @@ use 'gsuuon/note.nvim'
 ```
 
 ### Configuration
-With lazy.nvim:
+An example setup with lazy.nvim:
 ```lua
   {
     'gsuuon/note.nvim',
@@ -35,6 +35,17 @@ With lazy.nvim:
     },
     cmd = 'Note',
     ft = 'note'
+    keys = {
+      -- You can use telescope to search the current note space:
+      {'<leader>tn', -- [t]elescope [n]ote
+        function()
+          require('telescope.builtin').live_grep({
+            cwd = require('note.api').current_note_root()
+          })
+        end,
+        mode = 'n'
+      }
+    }
   }
 ```
 
