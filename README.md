@@ -34,7 +34,7 @@ An example setup with lazy.nvim:
       -- }
     },
     cmd = 'Note',
-    ft = 'note'
+    ft = 'note',
     keys = {
       -- You can use telescope to search the current note space:
       {'<leader>tn', -- [t]elescope [n]ote
