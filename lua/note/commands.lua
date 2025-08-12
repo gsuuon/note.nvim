@@ -67,12 +67,10 @@ local function link_filepath(link)
   })
 end
 
-local function follow_link_at_cursor()
-  local cursor = util.cursor()
-
+local function follow_link_at_position(line, row, col)
   local link = items.get_link_at_col(
-    vim.api.nvim_get_current_line(),
-    cursor.col
+    line,
+    col
   )
 
   if link == nil then return end
@@ -108,7 +106,7 @@ local function follow_link_at_cursor()
   -- TODO if ref can make case sensitive and add case sensitive refs
   local item = items.scan_for_item(
     link.link_target,
-    (link.file == nil) and cursor.row or 0,
+    (link.file == nil) and row or 0,
     lines,
     false
   )
@@ -120,6 +118,26 @@ local function follow_link_at_cursor()
   end
 
   util.cursor_set(item.position, link.file == nil)
+end
+
+local function follow_link_at_cursor()
+  local cursor = util.cursor()
+
+  follow_link_at_position(
+    vim.api.nvim_get_current_line(),
+    cursor.row,
+    cursor.col
+  )
+end
+
+local function follow_link_at_mouse()
+  local pos = vim.fn.getmousepos()
+
+  follow_link_at_position(
+    vim.api.nvim_buf_get_lines(0, pos.line - 1, pos.line, false)[1],
+    pos.line - 1,
+    pos.column
+  )
 end
 
 local function goto_current_item()
@@ -388,6 +406,14 @@ function M.create_buffer_commands()
       {}
     )
   end
+
+  vim.keymap.set('n', '<LeftMouse>', function()
+    follow_link_at_mouse()
+    vim.cmd.exec('"normal! \\<LeftMouse>"')
+  end, {
+    noremap = true,
+    buffer = true,
+  })
 
   vim.api.nvim_buf_create_user_command(
     0,
